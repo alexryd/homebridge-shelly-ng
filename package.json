@@ -4,6 +4,7 @@
   "description": "Homebridge plugin for the next generation of Shelly devices",
   "main": "dist/index.js",
   "scripts": {
+    "build": "rimraf ./dist && tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -20,5 +21,10 @@
   "bugs": {
     "url": "https://github.com/alexryd/homebridge-shelly-ng/issues"
   },
-  "homepage": "https://github.com/alexryd/homebridge-shelly-ng#readme"
+  "homepage": "https://github.com/alexryd/homebridge-shelly-ng#readme",
+  "devDependencies": {
+    "@types/node": "^17.0.4",
+    "rimraf": "^3.0.2",
+    "typescript": "^4.5.4"
+  }
 }
