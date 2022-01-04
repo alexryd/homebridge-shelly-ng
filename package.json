@@ -8,6 +8,10 @@
     "lint": "eslint ./src --ext .ts,.js --max-warnings=0",
     "test": "jest"
   },
+  "engines": {
+    "node": ">=14.18.1",
+    "homebridge": ">=1.3.5"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/alexryd/homebridge-shelly-ng.git"
