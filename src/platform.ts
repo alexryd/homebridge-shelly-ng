@@ -71,9 +71,26 @@ export class ShellyPlatform implements DynamicPlatformPlugin {
    * Initializes this platform.
    */
   protected initialize() {
-    this.shellies.registerDiscoverer(
-      new MdnsDeviceDiscoverer(),
-    );
+    this.startMdnsDeviceDiscovery();
+  }
+
+  /**
+   * Starts device discovery over mDNS.
+   */
+  protected async startMdnsDeviceDiscovery() {
+    // create a device discoverer
+    const discoverer = new MdnsDeviceDiscoverer();
+    // register it
+    this.shellies.registerDiscoverer(discoverer);
+
+    try {
+      // start it
+      await discoverer.start();
+
+      this.log.info('mDNS device discovery started');
+    } catch (e) {
+      this.log.error('Failed to start the mDNS device discovery service', e);
+    }
   }
 
   /**
