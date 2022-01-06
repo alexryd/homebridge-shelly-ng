@@ -18,6 +18,16 @@ import { DeviceHandler } from './device-handlers';
 type AccessoryUUID = string;
 
 /**
+ * The name of this plugin.
+ */
+export const PLUGIN_NAME = 'homebridge-shelly-ng';
+
+/**
+ * The name of this homebridge platform.
+ */
+export const PLATFORM_NAME = 'shelly-ng';
+
+/**
  * Implements a homebridge dynamic platform plugin.
  */
 export class ShellyPlatform implements DynamicPlatformPlugin {

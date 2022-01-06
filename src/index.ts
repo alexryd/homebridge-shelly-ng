@@ -1,7 +1,7 @@
 import { API } from 'homebridge';
 
-import { ShellyPlatform } from './platform';
+import { PLATFORM_NAME, ShellyPlatform } from './platform';
 
 export = (api: API) => {
-  api.registerPlatform('shelly-ng', ShellyPlatform);
+  api.registerPlatform(PLATFORM_NAME, ShellyPlatform);
 };
