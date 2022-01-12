@@ -10,7 +10,7 @@ type AccessoryId = string;
 /**
  * Represents a HomeKit accessory.
  */
-export class ShellyAccessory {
+export class Accessory {
   /**
    * Holds this accessory's abilities.
    */
@@ -80,7 +80,7 @@ export abstract class DeviceHandler {
   /**
    * Holds all accessories for this device.
    */
-  protected readonly accessories: Map<AccessoryId, ShellyAccessory> = new Map();
+  protected readonly accessories: Map<AccessoryId, Accessory> = new Map();
 
   /**
    * Logger specific for this device.
@@ -103,7 +103,7 @@ export abstract class DeviceHandler {
    * @param name - A user friendly name.
    * @param abilities - The abilities to add to this accessory.
    */
-  protected createAccessory(id: AccessoryId, name: string, ...abilities: Ability[]): ShellyAccessory {
+  protected createAccessory(id: AccessoryId, name: string, ...abilities: Ability[]): Accessory {
     // make sure the given ID is unique
     if (this.accessories.has(id)) {
       throw new Error(`An accessory with ID '${id}' already exists`);
@@ -129,7 +129,7 @@ export abstract class DeviceHandler {
     }
 
     // create an accessory
-    const accessory = new ShellyAccessory(pa, ...abilities);
+    const accessory = new Accessory(pa, ...abilities);
 
     // store the accessory
     this.accessories.set(id, accessory);
