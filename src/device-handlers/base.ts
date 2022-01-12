@@ -1,6 +1,7 @@
 import { Device } from 'shellies-ng';
 import { PlatformAccessory } from 'homebridge';
 
+import { Ability } from '../abilities';
 import { DeviceLogger } from '../utils/device-logger';
 import { ShellyAccessory } from '../accessory';
 import { PLATFORM_NAME, PLUGIN_NAME, ShellyPlatform } from '../platform';
@@ -19,7 +20,7 @@ export class DeviceHandler {
   /**
    * Logger specific for this device.
    */
-  protected readonly log: DeviceLogger;
+  readonly log: DeviceLogger;
 
   /**
    * @param device - The device to handle.
@@ -35,8 +36,9 @@ export class DeviceHandler {
    * If a matching platform accessory is not found in cache, a new one will be created.
    * @param id - A unique identifier for this accessory.
    * @param name - A user friendly name.
+   * @param abilities - The abilities to add to this accessory.
    */
-  protected createAccessory(id: AccessoryId, name: string): ShellyAccessory {
+  protected createAccessory(id: AccessoryId, name: string, ...abilities: Ability[]): ShellyAccessory {
     // make sure the given ID is unique
     if (this.accessories.has(id)) {
       throw new Error(`An accessory with ID '${id}' already exists`);
@@ -62,10 +64,15 @@ export class DeviceHandler {
     }
 
     // create an accessory
-    const accessory = new ShellyAccessory(pa);
+    const accessory = new ShellyAccessory(pa, ...abilities);
 
     // store the accessory
     this.accessories.set(id, accessory);
+
+    // setup all abilities
+    for (const a of abilities) {
+      a.setup(this, pa);
+    }
 
     if (newAccessory) {
       // register the platform accessory with homebridge
