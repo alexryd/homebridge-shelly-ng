@@ -36,9 +36,47 @@ export class ShellyAccessory {
 }
 
 /**
+ * Describes a device handler class.
+ */
+export interface DeviceHandlerClass {
+  new (device: Device, platform: ShellyPlatform): DeviceHandler;
+}
+
+/**
  * A DeviceHandler manages accessories for a device.
  */
-export class DeviceHandler {
+export abstract class DeviceHandler {
+  /**
+   * Holds all registered subclasses.
+   */
+  private static readonly subclasses: Map<string, DeviceHandlerClass> = new Map();
+
+  /**
+   * Registers a device handler, so that it can later be found based on its device model
+   * using the `DeviceHandler.getClass()` method.
+   * @param cls - A subclass of `DeviceHandler`.
+   * @param model - The device's model designation.
+   */
+  static registerClass(cls: DeviceHandlerClass, model: string) {
+    const mdl = model.toUpperCase();
+
+    // make sure it's not already registered
+    if (DeviceHandler.subclasses.has(mdl)) {
+      throw new Error(`A device handler for ${model} has already been registered`);
+    }
+
+    // add it to the list
+    DeviceHandler.subclasses.set(mdl, cls);
+  }
+
+  /**
+   * Returns the device handler for the given device model, if one has been registered.
+   * @param model - The model designation to lookup.
+   */
+  static getClass(model: string): DeviceHandlerClass | undefined {
+    return DeviceHandler.subclasses.get(model.toUpperCase());
+  }
+
   /**
    * Holds all accessories for this device.
    */

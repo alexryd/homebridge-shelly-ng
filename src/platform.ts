@@ -113,10 +113,18 @@ export class ShellyPlatform implements DynamicPlatformPlugin {
       return;
     }
 
+    // get the device handler class for this device
+    const cls = DeviceHandler.getClass(device.model);
+    if (cls === undefined) {
+      // this is an unknown device
+      this.log.info(`Unknown device discovered (${device.model})`);
+      return;
+    }
+
     // create a handler for this device
     this.deviceHandlers.set(
       device.id,
-      new DeviceHandler(device, this),
+      new cls(device, this),
     );
   }
 
