@@ -1,7 +1,7 @@
 import { Device } from 'shellies-ng';
 import { PlatformAccessory } from 'homebridge';
 
-import { Ability } from '../abilities';
+import { Ability, AccessoryInformationAbility } from '../abilities';
 import { DeviceLogger } from '../utils/device-logger';
 import { PLATFORM_NAME, PLUGIN_NAME, ShellyPlatform } from '../platform';
 
@@ -129,7 +129,11 @@ export abstract class DeviceHandler {
     }
 
     // create an accessory
-    const accessory = new Accessory(pa, ...abilities);
+    const accessory = new Accessory(
+      pa,
+      new AccessoryInformationAbility(this.device),
+      ...abilities,
+    );
 
     // store the accessory
     this.accessories.set(id, accessory);
