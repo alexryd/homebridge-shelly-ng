@@ -16,14 +16,10 @@ export class AccessoryInformationAbility extends Ability {
   }
 
   protected setupService(): Service {
-    // extract the MAC from the device ID
-    const m = this.device.id.match(/[A-Fa-f0-9]+$/);
-    const serialNumber = m !== null ? m[0] : this.device.id;
-
     return this.getOrAddService(this.Service.AccessoryInformation)
       .setCharacteristic(this.Characteristic.Manufacturer, 'Shelly')
       .setCharacteristic(this.Characteristic.Model, this.device.modelName)
-      .setCharacteristic(this.Characteristic.SerialNumber, serialNumber);
+      .setCharacteristic(this.Characteristic.SerialNumber, this.device.macAddress);
   }
 
   protected setupEventHandlers() {
