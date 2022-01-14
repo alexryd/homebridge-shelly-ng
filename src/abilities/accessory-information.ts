@@ -17,7 +17,7 @@ export class AccessoryInformationAbility extends Ability {
 
   protected setupService(): Service {
     return this.getOrAddService(this.Service.AccessoryInformation)
-      .setCharacteristic(this.Characteristic.Manufacturer, 'Shelly')
+      .setCharacteristic(this.Characteristic.Manufacturer, 'Allterco')
       .setCharacteristic(this.Characteristic.Model, this.device.modelName)
       .setCharacteristic(this.Characteristic.SerialNumber, this.device.macAddress);
   }
