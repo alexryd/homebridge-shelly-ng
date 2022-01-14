@@ -139,7 +139,7 @@ export abstract class DeviceHandler {
     this.accessories.set(id, accessory);
 
     // setup all abilities
-    for (const a of abilities) {
+    for (const a of accessory.abilities) {
       a.setup(this, pa);
     }
 
