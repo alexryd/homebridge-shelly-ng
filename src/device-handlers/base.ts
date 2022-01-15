@@ -93,7 +93,7 @@ export abstract class DeviceHandler {
    * @param platform - A reference to the homebridge platform.
    */
   constructor(readonly device: Device, readonly deviceName: string | null, readonly platform: ShellyPlatform) {
-    this.log = new DeviceLogger(device, platform.log);
+    this.log = new DeviceLogger(device, deviceName, platform.log);
     this.log.info('Device added');
 
     this.setup();
