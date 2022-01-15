@@ -106,7 +106,7 @@ export class ShellyPlatform implements DynamicPlatformPlugin {
   /**
    * Handles 'add' events from the shellies-ng library.
    */
-  protected handleAddedDevice(device: Device) {
+  protected async handleAddedDevice(device: Device) {
     // make sure this device hasn't already been added
     if (this.deviceHandlers.has(device.id)) {
       this.log.error(`Device with ID ${device.id} has already been added`);
@@ -121,11 +121,18 @@ export class ShellyPlatform implements DynamicPlatformPlugin {
       return;
     }
 
+    // load the system configuration for this device
+    const sysConfig = await device.system.getConfig();
+
     // create a handler for this device
-    this.deviceHandlers.set(
-      device.id,
-      new cls(device, this),
+    const handler = new cls(
+      device,
+      sysConfig.device?.name || null,
+      this,
     );
+
+    // store the handler
+    this.deviceHandlers.set(device.id, handler);
   }
 
   /**

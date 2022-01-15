@@ -39,7 +39,7 @@ export class Accessory {
  * Describes a device handler class.
  */
 export interface DeviceHandlerClass {
-  new (device: Device, platform: ShellyPlatform): DeviceHandler;
+  new (device: Device, deviceName: string | null, platform: ShellyPlatform): DeviceHandler;
 }
 
 /**
@@ -89,21 +89,30 @@ export abstract class DeviceHandler {
 
   /**
    * @param device - The device to handle.
+   * @param deviceName - A user-friendly name of the device.
    * @param platform - A reference to the homebridge platform.
    */
-  constructor(readonly device: Device, readonly platform: ShellyPlatform) {
+  constructor(readonly device: Device, readonly deviceName: string | null, readonly platform: ShellyPlatform) {
     this.log = new DeviceLogger(device, platform.log);
     this.log.info('Device added');
+
+    this.setup();
   }
+
+  /**
+   * Subclasses should override this method to setup the device handler and create their
+   * accessories.
+   */
+  protected abstract setup();
 
   /**
    * Creates an accessory with the given ID.
    * If a matching platform accessory is not found in cache, a new one will be created.
    * @param id - A unique identifier for this accessory.
-   * @param name - A user friendly name.
+   * @param nameSuffix - A string to append to the name of this accessory.
    * @param abilities - The abilities to add to this accessory.
    */
-  protected createAccessory(id: AccessoryId, name: string, ...abilities: Ability[]): Accessory {
+  protected createAccessory(id: AccessoryId, nameSuffix: string | null, ...abilities: Ability[]): Accessory {
     // make sure the given ID is unique
     if (this.accessories.has(id)) {
       throw new Error(`An accessory with ID '${id}' already exists`);
@@ -122,9 +131,12 @@ export abstract class DeviceHandler {
       // if no cached platform accessory was found, we need to create a new one
       this.log.debug(`Creating new accessory (id: ${id})`);
 
-      const deviceName = this.device.modelName;
+      let name = this.deviceName || this.device.modelName;
+      if (nameSuffix) {
+        name += ' ' + nameSuffix;
+      }
 
-      pa = this.createPlatformAccessory(uuid, `${deviceName} ${name}`);
+      pa = this.createPlatformAccessory(uuid, name);
       newAccessory = true;
     }
 
