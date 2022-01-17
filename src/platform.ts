@@ -62,6 +62,8 @@ export class ShellyPlatform implements DynamicPlatformPlugin {
     this.shellies
       .on('add', this.handleAddedDevice, this)
       .on('remove', this.handleRemovedDevice, this)
+      .on('exclude', this.handleExcludedDevice, this)
+      .on('unknown', this.handleUnknownDevice, this)
       .on('error', this.handleError, this);
 
     // wait for homebridge to finish launching
@@ -117,7 +119,7 @@ export class ShellyPlatform implements DynamicPlatformPlugin {
     const cls = DeviceHandler.getClass(device.model);
     if (cls === undefined) {
       // this is an unknown device
-      this.log.info(`Unknown device discovered (${device.model})`);
+      this.handleUnknownDevice(device.id, device.model);
       return;
     }
 
@@ -142,6 +144,20 @@ export class ShellyPlatform implements DynamicPlatformPlugin {
     // destroy and remove the device handler
     this.deviceHandlers.get(device.id)?.destroy();
     this.deviceHandlers.delete(device.id);
+  }
+
+  /**
+   * Handles 'exclude' events from the shellies-ng library.
+   */
+  protected handleExcludedDevice(deviceId: DeviceId) {
+    this.log.info(`[${deviceId}] Device excluded`);
+  }
+
+  /**
+   * Handles 'unknown' events from the shellies-ng library.
+   */
+  protected handleUnknownDevice(deviceId: DeviceId, model: string) {
+    this.log.info(`[${deviceId}] Unknown device of model "${model}" discovered.`);
   }
 
   /**
