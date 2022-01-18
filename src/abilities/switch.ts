@@ -49,7 +49,15 @@ export class SwitchAbility extends Ability {
       return;
     }
 
-    await this.component.set(value as boolean);
+    try {
+      await this.component.set(value as boolean);
+    } catch (e) {
+      this.log.error(
+        'Failed to set switch:',
+        e instanceof Error ? e.message : e,
+      );
+      throw this.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE;
+    }
   }
 
   /**
