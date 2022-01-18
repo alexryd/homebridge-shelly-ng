@@ -96,6 +96,12 @@ export abstract class DeviceHandler {
     this.log = new DeviceLogger(device, deviceName, platform.log);
     this.log.info('Device added');
 
+    this.log.debug(device.rpcHandler.connected ? 'Device is connected' : 'Device is disconnected');
+
+    device
+      .on('connect', this.handleConnect, this)
+      .on('disconnect', this.handleDisconnect, this);
+
     this.setup();
   }
 
@@ -195,9 +201,27 @@ export abstract class DeviceHandler {
   }
 
   /**
+   * Handles 'connect' events from the RPC handler.
+   */
+  protected handleConnect() {
+    this.log.info('Device connected');
+  }
+
+  /**
+   * Handles 'disconnect' events from the RPC handler.
+   */
+  protected handleDisconnect(code: number, reason: string) {
+    this.log.info(`Device disconnected (reason: ${reason})`);
+  }
+
+  /**
    * Removes all event listeners from this device.
    */
   detach() {
+    this.device
+      .off('connect', this.handleConnect, this)
+      .off('disconnect', this.handleDisconnect, this);
+
     // invoke detach() on all accessories
     for (const a of this.accessories.values()) {
       a.detach();
