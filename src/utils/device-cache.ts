@@ -177,4 +177,11 @@ export class DeviceCache {
       this.saveDelayed();
     }
   }
+
+  /**
+   * Returns a new Iterator object that contains each device.
+   */
+  [Symbol.iterator](): IterableIterator<CachedDeviceInfo> {
+    return this.devices.values();
+  }
 }

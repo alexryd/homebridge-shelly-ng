@@ -8,7 +8,9 @@ import {
 
 import {
   Device,
+  DeviceDiscoverer,
   DeviceId,
+  DeviceIdentifiers,
   MdnsDeviceDiscoverer,
   Shellies,
 } from 'shellies-ng';
@@ -22,6 +24,44 @@ type AccessoryUUID = string;
  * The name of this plugin.
  */
 export const PLUGIN_NAME = 'homebridge-shelly-ng';
+
+/**
+ * Utility class that "discovers" devices from a cache.
+ */
+export class CacheDeviceDiscoverer extends DeviceDiscoverer {
+  /**
+   * @param deviceCache - The cached devices.
+   * @param emitInterval - The interval, in milliseconds, to wait between each emitted device.
+   */
+  constructor(readonly deviceCache: DeviceCache, readonly emitInterval = 20) {
+    super();
+  }
+
+  /**
+   * Runs this discoverer.
+   */
+  async run() {
+    // emit all cached devices
+    for (const d of this.deviceCache) {
+      await this.emitDevice({
+        deviceId: d.id,
+        hostname: d.hostname,
+      });
+    }
+  }
+
+  /**
+   * Emits a device after the configured time interval has passed.
+   */
+  protected emitDevice(identifiers: DeviceIdentifiers): Promise<void> {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        this.handleDiscoveredDevice(identifiers);
+        resolve();
+      }, this.emitInterval);
+    });
+  }
+}
 
 /**
  * The name of this homebridge platform.
@@ -107,7 +147,21 @@ export class ShellyPlatform implements DynamicPlatformPlugin {
       );
     }
 
+    await this.runCacheDeviceDiscoverer();
+
     this.startMdnsDeviceDiscovery();
+  }
+
+  /**
+   * Discovers all devices found in cache.
+   */
+  protected runCacheDeviceDiscoverer(): Promise<void> {
+    // create a device discoverer
+    const discoverer = new CacheDeviceDiscoverer(this.deviceCache);
+    // register it
+    this.shellies.registerDiscoverer(discoverer);
+    // run it
+    return discoverer.run();
   }
 
   /**
