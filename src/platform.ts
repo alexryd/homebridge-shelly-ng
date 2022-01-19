@@ -13,6 +13,7 @@ import {
   Shellies,
 } from 'shellies-ng';
 
+import { DeviceCache } from './utils/device-cache';
 import { DeviceHandler } from './device-handlers';
 
 type AccessoryUUID = string;
@@ -42,6 +43,11 @@ export class ShellyPlatform implements DynamicPlatformPlugin {
   readonly cachedAccessories: Map<AccessoryUUID, PlatformAccessory> = new Map();
 
   /**
+   * A reference to our cached devices.
+   */
+  readonly deviceCache: DeviceCache;
+
+  /**
    * Holds all device handlers.
    */
   readonly deviceHandlers: Map<DeviceId, DeviceHandler> = new Map();
@@ -66,6 +72,8 @@ export class ShellyPlatform implements DynamicPlatformPlugin {
       .on('unknown', this.handleUnknownDevice, this)
       .on('error', this.handleError, this);
 
+    this.deviceCache = new DeviceCache(api.user.storagePath(), log);
+
     // wait for homebridge to finish launching
     api.on('didFinishLaunching', this.initialize.bind(this));
   }
@@ -82,7 +90,17 @@ export class ShellyPlatform implements DynamicPlatformPlugin {
   /**
    * Initializes this platform.
    */
-  protected initialize() {
+  protected async initialize() {
+    // load cached devices
+    try {
+      await this.deviceCache.load();
+    } catch (e) {
+      this.log.error(
+        'Failed to load cached devices:',
+        e instanceof Error ? e.message : e,
+      );
+    }
+
     this.startMdnsDeviceDiscovery();
   }
 
@@ -135,6 +153,9 @@ export class ShellyPlatform implements DynamicPlatformPlugin {
 
     // store the handler
     this.deviceHandlers.set(device.id, handler);
+
+    // store info about this device in cache
+    this.deviceCache.storeDevice(device);
   }
 
   /**
@@ -144,6 +165,9 @@ export class ShellyPlatform implements DynamicPlatformPlugin {
     // destroy and remove the device handler
     this.deviceHandlers.get(device.id)?.destroy();
     this.deviceHandlers.delete(device.id);
+
+    // delete this device from cache
+    this.deviceCache.delete(device.id);
   }
 
   /**

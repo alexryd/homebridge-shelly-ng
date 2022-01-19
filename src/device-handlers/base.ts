@@ -1,4 +1,4 @@
-import { Device, WebSocketRpcHandler } from 'shellies-ng';
+import { Device } from 'shellies-ng';
 import { PlatformAccessory } from 'homebridge';
 
 import { Ability, AccessoryInformationAbility } from '../abilities';
@@ -184,17 +184,8 @@ export abstract class DeviceHandler {
     );
 
     // store info in the context
-    const protocol = d.rpcHandler.protocol;
-    const rpc: Record<string, unknown> = { protocol };
-
-    if (protocol === 'websocket') {
-      rpc.hostname = (d.rpcHandler as WebSocketRpcHandler).hostname;
-    }
-
     pa.context.device = {
       id: d.id,
-      model: d.model,
-      rpc,
     };
 
     return pa;
