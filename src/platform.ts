@@ -91,6 +91,12 @@ export class ShellyPlatform implements DynamicPlatformPlugin {
    * Initializes this platform.
    */
   protected async initialize() {
+    this.log.debug(
+      this.cachedAccessories.size === 1
+        ? 'Loaded 1 accessory from cache'
+        : `Loaded ${this.cachedAccessories.size} accessories from cache`,
+    );
+
     // load cached devices
     try {
       await this.deviceCache.load();
