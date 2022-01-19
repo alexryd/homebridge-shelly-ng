@@ -8,5 +8,6 @@ For the old generation, see [homebridge-shelly](https://github.com/alexryd/homeb
 This plugin is under development.
 
 ## Supported devices
+* [Shelly Plus 1](https://shelly.cloud/shelly-plus-1/)
 * [Shelly Plus 1PM](https://shelly.cloud/shelly-plus-1pm/)
 * [Shelly Pro 4PM](https://shelly.cloud/shelly-pro-smart-home-automation-solution/)
