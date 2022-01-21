@@ -1,5 +1,5 @@
 {
-  "pluginAlias": "Shelly NG",
+  "pluginAlias": "ShellyNG",
   "pluginType": "platform",
   "singular": true,
   "schema": {

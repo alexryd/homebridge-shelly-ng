@@ -24,7 +24,7 @@ or manually by following these instructions:
   ```
   "platforms": [
     {
-      "platform": "shelly-ng",
+      "platform": "ShellyNG",
       "name": "Shelly NG"
     }
   ]

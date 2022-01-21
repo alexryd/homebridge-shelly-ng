@@ -66,7 +66,7 @@ export class CacheDeviceDiscoverer extends DeviceDiscoverer {
 /**
  * The name of this homebridge platform.
  */
-export const PLATFORM_NAME = 'shelly-ng';
+export const PLATFORM_NAME = 'ShellyNG';
 
 /**
  * Implements a homebridge dynamic platform plugin.
