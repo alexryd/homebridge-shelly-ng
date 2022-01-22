@@ -6,7 +6,9 @@
   "scripts": {
     "build": "rimraf ./dist && tsc",
     "lint": "eslint ./src --ext .ts,.js --max-warnings=0",
-    "test": "jest"
+    "test": "jest",
+    "preversion": "npm run build && npm run lint",
+    "postversion": "git push && git push --tags"
   },
   "engines": {
     "node": ">=14.18.1",
