@@ -173,13 +173,19 @@ export class ShellyPlatform implements DynamicPlatformPlugin {
     // register it
     this.shellies.registerDiscoverer(discoverer);
 
+    // log errors
+    discoverer.on('error', (error: Error) => {
+      this.log.error('An error occurred in the mDNS device discovery service:', error.message);
+      this.log.debug(error.stack || '');
+    });
+
     try {
-      // start it
+      // start the service
       await discoverer.start();
 
       this.log.info('mDNS device discovery started');
     } catch (e) {
-      this.log.error('Failed to start the mDNS device discovery service', e);
+      this.log.error('Failed to start the mDNS device discovery service', e instanceof Error ? e.message : e);
     }
   }
 
@@ -247,8 +253,9 @@ export class ShellyPlatform implements DynamicPlatformPlugin {
   /**
    * Handles 'error' events from the shellies-ng library.
    */
-  protected handleError(error: Error) {
+  protected handleError(deviceId: DeviceId, error: Error) {
     // print the error to the log
-    this.log.error('', error);
+    this.log.error(error.message);
+    this.log.debug(error.stack || '');
   }
 }
