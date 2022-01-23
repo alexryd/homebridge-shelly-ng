@@ -34,39 +34,34 @@ const DEFAULT_DEVICE_OPTIONS: Readonly<DeviceOptions> = {
   protocol: 'websocket',
 };
 
-export interface PlatformOptions {
+/**
+ * Handles configuration options for the platform.
+ */
+export class PlatformOptions {
   /**
    * Options for the mDNS device discoverer.
    */
-  mdns: MdnsOptions;
+  readonly mdns: MdnsOptions;
   /**
    * Device specific configuration options.
    */
-  deviceOptions: Map<DeviceId, DeviceOptions>;
-}
+  readonly deviceOptions: Map<DeviceId, DeviceOptions> = new Map();
 
-/**
- * Takes the platform configuration supplied by homebridge and adds default values.
- * @param config - The platform configuration.
- */
-export const getPlatformOptions = (config: PlatformConfig): PlatformOptions => {
-  // get the mDNS options
-  const mdns = { ...DEFAULT_MDNS_OPTIONS, ...config.mdns };
+  /**
+   * @param config - The platform configuration.
+   */
+  constructor(config: PlatformConfig) {
+    // store the mDNS options (with default values)
+    this.mdns = { ...DEFAULT_MDNS_OPTIONS, ...config.mdns };
 
-  // get the device options
-  const deviceOptions = new Map<DeviceId, DeviceOptions>();
-
-  if (Array.isArray(config.devices)) {
-    // loop through each item and add default values
-    for (const d of config.devices) {
-      if (d.id) {
-        deviceOptions.set(d.id, { ...DEFAULT_DEVICE_OPTIONS, ...d });
+    // store the device options
+    if (Array.isArray(config.devices)) {
+      // loop through each item and add default values
+      for (const d of config.devices) {
+        if (d && d.id) {
+          this.deviceOptions.set(d.id, { ...DEFAULT_DEVICE_OPTIONS, ...d });
+        }
       }
     }
   }
-
-  return {
-    mdns,
-    deviceOptions,
-  };
-};
+}

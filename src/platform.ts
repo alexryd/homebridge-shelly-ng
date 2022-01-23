@@ -17,7 +17,7 @@ import {
 
 import { DeviceCache } from './utils/device-cache';
 import { DeviceHandler } from './device-handlers';
-import { getPlatformOptions, PlatformOptions } from './config';
+import { PlatformOptions } from './config';
 
 type AccessoryUUID = string;
 
@@ -110,7 +110,7 @@ export class ShellyPlatform implements DynamicPlatformPlugin {
     readonly api: API,
   ) {
     // get the platform options
-    this.options = getPlatformOptions(config);
+    this.options = new PlatformOptions(config);
 
     // setup shellies-ng
     this.shellies = new Shellies({
