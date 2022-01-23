@@ -262,6 +262,32 @@ export class ShellyPlatform implements DynamicPlatformPlugin {
 
     // delete this device from cache
     this.deviceCache.delete(deviceId);
+
+    if (this.deviceHandlers.has(deviceId)) {
+      // destroy and remove the device handler
+      this.deviceHandlers.get(deviceId)!.destroy();
+      this.deviceHandlers.delete(deviceId);
+    } else {
+      // find all of its platform accessories
+      const pas: PlatformAccessory[] = [];
+
+      for (const pa of this.cachedAccessories.values()) {
+        if (pa.context.device?.id === deviceId) {
+          pas.push(pa);
+        }
+      }
+
+      // unregister them
+      if (pas.length > 0) {
+        this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, pas);
+      }
+
+      this.log.debug(
+        pas.length === 1
+          ? '1 platform accessory unregistered'
+          : `${pas.length} platform accessories unregistered`,
+      );
+    }
   }
 
   /**
