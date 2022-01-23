@@ -17,6 +17,7 @@ import {
 
 import { DeviceCache } from './utils/device-cache';
 import { DeviceHandler } from './device-handlers';
+import { getPlatformOptions, PlatformOptions } from './config';
 
 type AccessoryUUID = string;
 
@@ -24,6 +25,11 @@ type AccessoryUUID = string;
  * The name of this plugin.
  */
 export const PLUGIN_NAME = 'homebridge-shelly-ng';
+
+/**
+ * The name of this homebridge platform.
+ */
+export const PLATFORM_NAME = 'ShellyNG';
 
 /**
  * Utility class that "discovers" devices from a cache.
@@ -64,14 +70,14 @@ export class CacheDeviceDiscoverer extends DeviceDiscoverer {
 }
 
 /**
- * The name of this homebridge platform.
- */
-export const PLATFORM_NAME = 'ShellyNG';
-
-/**
  * Implements a homebridge dynamic platform plugin.
  */
 export class ShellyPlatform implements DynamicPlatformPlugin {
+  /**
+   * The configuration options for this platform.
+   */
+  readonly options: PlatformOptions;
+
   /**
    * A reference to the shellies-ng library.
    */
@@ -100,11 +106,16 @@ export class ShellyPlatform implements DynamicPlatformPlugin {
    */
   constructor(
     readonly log: Logger,
-    readonly config: PlatformConfig,
+    config: PlatformConfig,
     readonly api: API,
   ) {
+    // get the platform options
+    this.options = getPlatformOptions(config);
+
     // setup shellies-ng
-    this.shellies = new Shellies();
+    this.shellies = new Shellies({
+      deviceOptions: this.options.deviceOptions,
+    });
     this.shellies
       .on('add', this.handleAddedDevice, this)
       .on('remove', this.handleRemovedDevice, this)
@@ -149,7 +160,11 @@ export class ShellyPlatform implements DynamicPlatformPlugin {
 
     await this.runCacheDeviceDiscoverer();
 
-    this.startMdnsDeviceDiscovery();
+    if (this.options.mdns.enable === true) {
+      this.startMdnsDeviceDiscovery();
+    } else {
+      this.log.debug('mDNS device discovery disabled');
+    }
   }
 
   /**
@@ -169,7 +184,7 @@ export class ShellyPlatform implements DynamicPlatformPlugin {
    */
   protected async startMdnsDeviceDiscovery() {
     // create a device discoverer
-    const discoverer = new MdnsDeviceDiscoverer();
+    const discoverer = new MdnsDeviceDiscoverer(this.options.mdns);
     // register it
     this.shellies.registerDiscoverer(discoverer);
 
@@ -185,7 +200,10 @@ export class ShellyPlatform implements DynamicPlatformPlugin {
 
       this.log.info('mDNS device discovery started');
     } catch (e) {
-      this.log.error('Failed to start the mDNS device discovery service', e instanceof Error ? e.message : e);
+      this.log.error('Failed to start the mDNS device discovery service:', e instanceof Error ? e.message : e);
+      if (e instanceof Error && e.stack) {
+        this.log.debug(e.stack);
+      }
     }
   }
 
