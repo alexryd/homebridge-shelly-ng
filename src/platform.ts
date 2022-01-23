@@ -225,15 +225,19 @@ export class ShellyPlatform implements DynamicPlatformPlugin {
       return;
     }
 
-    // load the system configuration for this device
-    const sysConfig = await device.system.getConfig();
+    // get the configuration options for this device (and copy them)
+    const opts = { ...this.options.getDeviceOptions(device.id) };
+
+    // if no name has been specified...
+    if (!opts.name) {
+      // load the system configuration for this device
+      const sysConfig = await device.system.getConfig();
+      // use the name from the API
+      opts.name = sysConfig.device?.name;
+    }
 
     // create a handler for this device
-    const handler = new cls(
-      device,
-      sysConfig.device?.name || null,
-      this,
-    );
+    const handler = new cls(device, opts, this);
 
     // store the handler
     this.deviceHandlers.set(device.id, handler);

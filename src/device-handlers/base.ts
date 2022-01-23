@@ -3,6 +3,7 @@ import { PlatformAccessory } from 'homebridge';
 
 import { Ability, AccessoryInformationAbility } from '../abilities';
 import { DeviceLogger } from '../utils/device-logger';
+import { DeviceOptions } from '../config';
 import { PLATFORM_NAME, PLUGIN_NAME, ShellyPlatform } from '../platform';
 
 type AccessoryId = string;
@@ -39,7 +40,7 @@ export class Accessory {
  * Describes a device handler class.
  */
 export interface DeviceHandlerClass {
-  new (device: Device, deviceName: string | null, platform: ShellyPlatform): DeviceHandler;
+  new (device: Device, options: DeviceOptions, platform: ShellyPlatform): DeviceHandler;
 }
 
 /**
@@ -89,11 +90,11 @@ export abstract class DeviceHandler {
 
   /**
    * @param device - The device to handle.
-   * @param deviceName - A user-friendly name of the device.
+   * @param options - Configuration options for the device.
    * @param platform - A reference to the homebridge platform.
    */
-  constructor(readonly device: Device, readonly deviceName: string | null, readonly platform: ShellyPlatform) {
-    this.log = new DeviceLogger(device, deviceName, platform.log);
+  constructor(readonly device: Device, readonly options: DeviceOptions, readonly platform: ShellyPlatform) {
+    this.log = new DeviceLogger(device, options.name, platform.log);
     this.log.info('Device added');
 
     this.log.debug(device.rpcHandler.connected ? 'Device is connected' : 'Device is disconnected');
@@ -137,7 +138,7 @@ export abstract class DeviceHandler {
       // if no cached platform accessory was found, we need to create a new one
       this.log.debug(`Creating new accessory (id: ${id})`);
 
-      let name = this.deviceName || this.device.modelName;
+      let name = this.options.name || this.device.modelName;
       if (nameSuffix) {
         name += ' ' + nameSuffix;
       }

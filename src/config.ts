@@ -20,6 +20,10 @@ const DEFAULT_MDNS_OPTIONS: Readonly<MdnsOptions> = {
 
 export interface DeviceOptions {
   /**
+   * The name of the device.
+   */
+  name?: string;
+  /**
    * Whether the device should be excluded.
    */
   exclude: boolean;
@@ -63,5 +67,14 @@ export class PlatformOptions {
         }
       }
     }
+  }
+
+  /**
+   * Return the configuration options for the device with the given ID.
+   * If no options have been specified, default values will be returned.
+   * @param deviceId - The device ID.
+   */
+  getDeviceOptions(deviceId: DeviceId): DeviceOptions {
+    return this.deviceOptions.get(deviceId) || DEFAULT_DEVICE_OPTIONS;
   }
 }
