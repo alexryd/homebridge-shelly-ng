@@ -259,6 +259,9 @@ export class ShellyPlatform implements DynamicPlatformPlugin {
    */
   protected handleExcludedDevice(deviceId: DeviceId) {
     this.log.info(`[${deviceId}] Device excluded`);
+
+    // delete this device from cache
+    this.deviceCache.delete(deviceId);
   }
 
   /**
