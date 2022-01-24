@@ -10,6 +10,49 @@
         "type": "string",
         "required": true,
         "default": "Shelly NG"
+      },
+      "mdns": {
+        "type": "object",
+        "properties": {
+          "enable": {
+            "title": "Enable",
+            "type": "boolean",
+            "default": true
+          },
+          "interface": {
+            "title": "Network interface",
+            "type": "string"
+          }
+        }
+      },
+      "devices": {
+        "type": "array",
+        "items": {
+          "title": "Device",
+          "type": "object",
+          "properties": {
+            "id": {
+              "title": "Device ID",
+              "type": "string",
+              "placeholder": "e.g. shellyplus1-abcdef123456",
+              "required": true
+            },
+            "name": {
+              "title": "Name",
+              "type": "string"
+            },
+            "exclude": {
+              "title": "Exclude",
+              "type": "boolean",
+              "default": false
+            },
+            "hostname": {
+              "title": "IP address or hostname",
+              "type": "string",
+              "placeholder": "e.g. 192.168.1.100"
+            }
+          }
+        }
       }
     }
   }
