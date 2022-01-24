@@ -31,6 +31,10 @@ export interface DeviceOptions {
    * The protocol to use when communicating with the device.
    */
   protocol: 'websocket';
+  /**
+   * The IP address or hostname of the device.
+   */
+  hostname?: string;
 }
 
 const DEFAULT_DEVICE_OPTIONS: Readonly<DeviceOptions> = {

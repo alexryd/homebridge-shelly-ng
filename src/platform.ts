@@ -32,6 +32,46 @@ export const PLUGIN_NAME = 'homebridge-shelly-ng';
 export const PLATFORM_NAME = 'ShellyNG';
 
 /**
+ * Utility class that "discovers" devices from the configuration options.
+ */
+export class ConfigDeviceDiscoverer extends DeviceDiscoverer {
+  /**
+   * @param options - The platform configuration options.
+   * @param emitInterval - The interval, in milliseconds, to wait between each emitted device.
+   */
+  constructor(readonly options: PlatformOptions, readonly emitInterval = 20) {
+    super();
+  }
+
+  /**
+   * Runs this discoverer.
+   */
+  async run() {
+    // emit all devices that have a configured hostname
+    for (const [id, opts] of this.options.deviceOptions) {
+      if (opts.hostname) {
+        await this.emitDevice({
+          deviceId: id,
+          hostname: opts.hostname,
+        });
+      }
+    }
+  }
+
+  /**
+   * Emits a device after the configured time interval has passed.
+   */
+  protected emitDevice(identifiers: DeviceIdentifiers): Promise<void> {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        this.handleDiscoveredDevice(identifiers);
+        resolve();
+      }, this.emitInterval);
+    });
+  }
+}
+
+/**
  * Utility class that "discovers" devices from a cache.
  */
 export class CacheDeviceDiscoverer extends DeviceDiscoverer {
@@ -148,6 +188,8 @@ export class ShellyPlatform implements DynamicPlatformPlugin {
         : `Loaded ${this.cachedAccessories.size} accessories from cache`,
     );
 
+    await this.runConfigDeviceDiscoverer();
+
     // load cached devices
     try {
       await this.deviceCache.load();
@@ -165,6 +207,18 @@ export class ShellyPlatform implements DynamicPlatformPlugin {
     } else {
       this.log.debug('mDNS device discovery disabled');
     }
+  }
+
+  /**
+   * Discovers all devices found in the configuration.
+   */
+  protected runConfigDeviceDiscoverer(): Promise<void> {
+    // create a device discoverer
+    const discoverer = new ConfigDeviceDiscoverer(this.options);
+    // register it
+    this.shellies.registerDiscoverer(discoverer);
+    // run it
+    return discoverer.run();
   }
 
   /**
