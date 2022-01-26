@@ -99,9 +99,10 @@ export abstract class DeviceHandler {
 
     this.log.debug(device.rpcHandler.connected ? 'Device is connected' : 'Device is disconnected');
 
-    device
+    device.rpcHandler
       .on('connect', this.handleConnect, this)
-      .on('disconnect', this.handleDisconnect, this);
+      .on('disconnect', this.handleDisconnect, this)
+      .on('request', this.handleRequest, this);
 
     this.setup();
   }
@@ -207,12 +208,20 @@ export abstract class DeviceHandler {
   }
 
   /**
+   * Handles 'request' events from the RPC handler.
+   */
+  protected handleRequest(method: string) {
+    this.log.debug('WebSocket:', method);
+  }
+
+  /**
    * Removes all event listeners from this device.
    */
   detach() {
-    this.device
+    this.device.rpcHandler
       .off('connect', this.handleConnect, this)
-      .off('disconnect', this.handleDisconnect, this);
+      .off('disconnect', this.handleDisconnect, this)
+      .off('request', this.handleRequest, this);
 
     // invoke detach() on all accessories
     for (const a of this.accessories.values()) {
