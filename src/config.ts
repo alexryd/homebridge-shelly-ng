@@ -35,6 +35,10 @@ export interface DeviceOptions {
    * The IP address or hostname of the device.
    */
   hostname?: string;
+  /**
+   * The password to use if the Shelly device requires authentication.
+   */
+  password?: string;
 }
 
 const DEFAULT_DEVICE_OPTIONS: Readonly<DeviceOptions> = {
