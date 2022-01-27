@@ -1,3 +1,5 @@
+<a href="https://github.com/alexryd/homebridge-shelly-ng"><img src="homebridge-shelly-ng.png" height="120"></a>
+
 # homebridge-shelly-ng
 [![npm-version](https://badgen.net/npm/v/homebridge-shelly-ng)](https://www.npmjs.com/package/homebridge-shelly-ng)
 
@@ -5,8 +7,6 @@
 enabling HomeKit support for the next generation of Shelly devices.
 
 For the first generation, see [homebridge-shelly](https://github.com/alexryd/homebridge-shelly).
-
-This plugin is under development.
 
 ## Supported devices
 
