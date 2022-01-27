@@ -1,5 +1,5 @@
-import { access, readFile, writeFile } from 'fs/promises';
 import { Logger } from 'homebridge';
+import { promises as fs } from 'fs';
 import { resolve } from 'path';
 
 import { Device, DeviceId, WebSocketRpcHandler } from 'shellies-ng';
@@ -64,7 +64,7 @@ export class DeviceCache {
 
     try {
       // see if the cache file exists
-      await access(this.path);
+      await fs.access(this.path);
     } catch (_) {
       // the file doesn't exist
       this.log.debug('Device cache file not found');
@@ -72,7 +72,7 @@ export class DeviceCache {
     }
 
     // read the file
-    const data: string = await readFile(this.path, { encoding: 'utf8' });
+    const data: string = await fs.readFile(this.path, { encoding: 'utf8' });
     const s = JSON.parse(data) as DeviceStorage;
 
     this.log.debug(`Loaded ${s.devices.length} device(s) from cache`);
@@ -94,7 +94,7 @@ export class DeviceCache {
     this.log.debug(`Saving ${s.devices.length} device(s) to cache`);
 
     // write them to disk
-    return writeFile(this.path, data);
+    return fs.writeFile(this.path, data);
   }
 
   /**
