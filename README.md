@@ -61,7 +61,7 @@ See below for descriptions of each configuration option.
 | Option                 | Description |
 | ---                    | ---         |
 | `devices`              | An array of one or more objects with options for specific devices. |
-| `devices.id`           | The device ID. [Here's how to find it](https://github.com/alexryd/homebridge-shelly-ng). |
+| `devices.id`           | The device ID. [Here's how to find it](https://github.com/alexryd/homebridge-shelly-ng/wiki/Finding-a-device-ID). |
 | `devices.name`         | The name of the device. This will be shown in the homebridge log and will be used as the default name when the device is added to HomeKit. Note though that setting this value after the device has been added will not change the name in HomeKit. If no name is specified, this plugin will use the device name set in the Shelly app, or the name of the device model. |
 | `devices.exclude`      | Set this value to `true` to make this plugin ignore this device. |
 | `devices.hostname`     | The IP address or hostname of the device. Set this value if your device can't be discovered automatically. |
