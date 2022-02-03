@@ -1,5 +1,5 @@
 export * from './base';
 
-export * from './shellyplus1';
-export * from './shellyplus1pm';
-export * from './shellypro4pm';
+export * from './shelly-plus-1';
+export * from './shelly-plus-1-pm';
+export * from './shelly-pro-4-pm';
