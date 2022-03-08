@@ -2,39 +2,10 @@ import { Device } from 'shellies-ng';
 import { PlatformAccessory } from 'homebridge';
 
 import { Ability, AccessoryInformationAbility } from '../abilities';
+import { Accessory, AccessoryId } from '../accessory';
 import { DeviceLogger } from '../utils/device-logger';
 import { DeviceOptions } from '../config';
-import { PLATFORM_NAME, PLUGIN_NAME, ShellyPlatform } from '../platform';
-
-type AccessoryId = string;
-
-/**
- * Represents a HomeKit accessory.
- */
-export class Accessory {
-  /**
-   * Holds this accessory's abilities.
-   */
-  readonly abilities: Ability[];
-
-  /**
-   * @param platformAccessory - The underlying homebridge platform accessory.
-   * @param abilities - The abilities that this accessory has.
-   */
-  constructor(readonly platformAccessory: PlatformAccessory, ...abilities: Ability[]) {
-    this.abilities = abilities;
-  }
-
-  /**
-   * Removes all event listeners from this accessory.
-   */
-  detach() {
-    // invoke detach() on all abilities
-    for (const a of this.abilities) {
-      a.detach();
-    }
-  }
-}
+import { ShellyPlatform } from '../platform';
 
 /**
  * Describes a device handler class.
@@ -126,31 +97,18 @@ export abstract class DeviceHandler {
       throw new Error(`An accessory with ID '${id}' already exists`);
     }
 
-    // generate a UUID for this accessory
-    const uuid = this.platform.api.hap.uuid.generate(`${this.device.id}-${id}`);
-
-    // see if there's a cached platform accessory with this UUID
-    let pa = this.platform.cachedAccessories.get(uuid);
-    let newAccessory = false;
-
-    if (pa) {
-      this.log.debug(`Accessory loaded from cache (id: ${id})`);
-    } else {
-      // if no cached platform accessory was found, we need to create a new one
-      this.log.debug(`Creating new accessory (id: ${id})`);
-
-      let name = this.options.name || this.device.modelName;
-      if (nameSuffix) {
-        name += ' ' + nameSuffix;
-      }
-
-      pa = this.createPlatformAccessory(uuid, name);
-      newAccessory = true;
+    let name = this.options.name || this.device.modelName;
+    if (nameSuffix) {
+      name += ' ' + nameSuffix;
     }
 
     // create an accessory
     const accessory = new Accessory(
-      pa,
+      id,
+      this.device.id,
+      name,
+      this.platform,
+      this.log,
       new AccessoryInformationAbility(this.device),
       ...abilities,
     );
@@ -158,39 +116,7 @@ export abstract class DeviceHandler {
     // store the accessory
     this.accessories.set(id, accessory);
 
-    // setup all abilities
-    for (const a of accessory.abilities) {
-      a.setup(this, pa);
-    }
-
-    if (newAccessory) {
-      // register the platform accessory with homebridge
-      this.platform.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [pa]);
-    }
-
     return accessory;
-  }
-
-  /**
-   * Creates a new platform accessory with the given UUID.
-   * @param uuid - A UUID.
-   * @param name - A user friendly name.
-   */
-  protected createPlatformAccessory(uuid: string, name: string): PlatformAccessory {
-    const d = this.device;
-
-    // create a new accessory
-    const pa = new this.platform.api.platformAccessory(
-      name,
-      uuid,
-    );
-
-    // store info in the context
-    pa.context.device = {
-      id: d.id,
-    };
-
-    return pa;
   }
 
   /**
@@ -236,10 +162,13 @@ export abstract class DeviceHandler {
     this.detach();
 
     // find all platform accessories
-    const pas = Array.from(this.accessories.values()).map(a => a.platformAccessory);
+    const pas = Array.from(this.accessories.values())
+      .map(a => a.platformAccessory)
+      .filter(a => a !== null) as PlatformAccessory[];
+
     if (pas.length > 0) {
-      // unregister the accessories from homebridge
-      this.platform.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, pas);
+      // remove the accessories from the platform
+      this.platform.removeAccessory(...pas);
     }
 
     this.log.info('Device removed');

@@ -19,7 +19,7 @@ import { DeviceCache } from './utils/device-cache';
 import { DeviceHandler } from './device-handlers';
 import { PlatformOptions } from './config';
 
-type AccessoryUUID = string;
+type AccessoryUuid = string;
 
 /**
  * The name of this plugin.
@@ -124,9 +124,10 @@ export class ShellyPlatform implements DynamicPlatformPlugin {
   protected readonly shellies: Shellies;
 
   /**
-   * Holds all platform accessories that were loaded from cache during launch.
+   * Holds all platform accessories that were loaded from cache during launch,
+   * as well as accessories that have been created since launch.
    */
-  readonly cachedAccessories: Map<AccessoryUUID, PlatformAccessory> = new Map();
+  protected readonly accessories: Map<AccessoryUuid, PlatformAccessory> = new Map();
 
   /**
    * A reference to our cached devices.
@@ -175,7 +176,61 @@ export class ShellyPlatform implements DynamicPlatformPlugin {
    */
   configureAccessory(accessory: PlatformAccessory) {
     // store it for later
-    this.cachedAccessories.set(accessory.UUID, accessory);
+    this.accessories.set(accessory.UUID, accessory);
+  }
+
+  /**
+   * Returns the platform accessory with the given UUID.
+   * @param uuid - The UUID.
+   */
+  getAccessory(uuid: AccessoryUuid): PlatformAccessory | undefined {
+    return this.accessories.get(uuid);
+  }
+
+  /**
+   * Adds one or more platform accessories to this platform.
+   * This method will also register the accessories with homebridge.
+   * @param accessories - The platform accessories to add.
+   */
+  addAccessory(...accessories: PlatformAccessory[]) {
+    if (accessories.length === 0) {
+      return;
+    }
+
+    const accs: PlatformAccessory[] = [];
+
+    // add the accessories to our list
+    for (const pa of accessories) {
+      // skip if this accessory has already been added
+      if (this.accessories.has(pa.UUID)) {
+        continue;
+      }
+
+      this.accessories.set(pa.UUID, pa);
+      accs.push(pa);
+    }
+
+    // register the accessories with homebridge
+    this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, accs);
+  }
+
+  /**
+   * Removes one or more platform accessories from this platform.
+   * This method will also unregister the accessories from homebridge.
+   * @param accessories - The platform accessories to remove.
+   */
+  removeAccessory(...accessories: PlatformAccessory[]) {
+    if (accessories.length === 0) {
+      return;
+    }
+
+    // remove the accessories from our list
+    for (const pa of accessories) {
+      this.accessories.delete(pa.UUID);
+    }
+
+    // unregister the accessories from homebridge
+    this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, accessories);
   }
 
   /**
@@ -183,9 +238,9 @@ export class ShellyPlatform implements DynamicPlatformPlugin {
    */
   protected async initialize() {
     this.log.debug(
-      this.cachedAccessories.size === 1
+      this.accessories.size === 1
         ? 'Loaded 1 accessory from cache'
-        : `Loaded ${this.cachedAccessories.size} accessories from cache`,
+        : `Loaded ${this.accessories.size} accessories from cache`,
     );
 
     await this.runConfigDeviceDiscoverer();
@@ -329,7 +384,7 @@ export class ShellyPlatform implements DynamicPlatformPlugin {
       // find all of its platform accessories
       const pas: PlatformAccessory[] = [];
 
-      for (const pa of this.cachedAccessories.values()) {
+      for (const pa of this.accessories.values()) {
         if (pa.context.device?.id === deviceId) {
           pas.push(pa);
         }

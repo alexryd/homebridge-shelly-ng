@@ -1,7 +1,6 @@
 import { Input } from 'shellies-ng';
-import { Service } from 'homebridge';
 
-import { Ability } from './base';
+import { Ability, ServiceClass } from './base';
 
 enum ButtonPress {
   Single = 'single',
@@ -14,27 +13,23 @@ export class StatelessProgrammableSwitchAbility extends Ability {
    * @param component - The input component to control.
    */
   constructor(readonly component: Input) {
-    super();
+    super(
+      `Button ${component.id + 1}`,
+      `stateless-programmable-switch-${component.id}`,
+    );
   }
 
-  protected setupService(): Service {
-    // create the service
-    const service = this.getOrAddService(
-      this.Service.StatelessProgrammableSwitch,
-      `Button ${this.component.id + 1}`,
-      `stateless-programmable-switch-${this.component.id}`,
-    );
+  protected get serviceClass(): ServiceClass {
+    return this.Service.StatelessProgrammableSwitch;
+  }
 
+  protected initialize() {
     // set the index number for this switch
-    service.setCharacteristic(
+    this.service.setCharacteristic(
       this.Characteristic.ServiceLabelIndex,
       this.component.id,
     );
 
-    return service;
-  }
-
-  protected setupEventHandlers() {
     // listen for button press events
     this.component
       .on('singlePush', this.singlePushHandler, this)

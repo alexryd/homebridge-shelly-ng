@@ -1,6 +1,4 @@
-import { Service } from 'homebridge';
-
-import { Ability } from './base';
+import { Ability, ServiceClass } from './base';
 
 export class ServiceLabelAbility extends Ability {
   /**
@@ -10,23 +8,18 @@ export class ServiceLabelAbility extends Ability {
     super();
   }
 
-  protected setupService(): Service {
+  protected get serviceClass(): ServiceClass {
+    return this.Service.ServiceLabel;
+  }
+
+  protected initialize() {
     const SLN = this.Characteristic.ServiceLabelNamespace;
 
-    // create the service
-    const service = this.getOrAddService(this.Service.ServiceLabel);
-
     // set the namespace
-    service.setCharacteristic(
+    this.service.setCharacteristic(
       SLN,
       this.namespace === 'dots' ? SLN.DOTS : SLN.ARABIC_NUMERALS,
     );
-
-    return service;
-  }
-
-  protected setupEventHandlers() {
-    // nothing to setup
   }
 
   detach() {

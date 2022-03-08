@@ -6,8 +6,10 @@ import {
   WithUUID,
 } from 'homebridge';
 
-import { DeviceHandler } from '../device-handlers';
 import { DeviceLogger } from '../utils/device-logger';
+import { ShellyPlatform } from '../platform';
+
+export type ServiceClass = WithUUID<typeof Service>;
 
 /**
  * Base class for all abilities.
@@ -76,50 +78,158 @@ export abstract class Ability {
     return this._service;
   }
 
+  private _active = true;
+
+  /**
+   * Whether this ability is active.
+   * Setting an ability to inactive will remove its HomeKit service.
+   */
+  get active(): boolean {
+    return this._active;
+  }
+
+  set active(value) {
+    if (value === this._active) {
+      return;
+    }
+
+    this._active = value;
+    this.update();
+  }
+
+  /**
+   * @param serviceName - A name of the service.
+   * @param serviceSubtype - A unique identifier for the service.
+   */
+  constructor(
+    protected readonly serviceName?: string,
+    protected readonly serviceSubtype?: string,
+  ) {}
+
   /**
    * Sets up this ability.
-   * This method must be called to initialize the ability.
-   * @param deviceHandler - The device handler that created this ability.
+   * This method is called by the parent accessory every time it becomes active.
    * @param platformAccessory - The homebridge platform accessory to use.
+   * @param platform - A reference to the platform.
+   * @param log - The logger to use.
    */
-  setup(deviceHandler: DeviceHandler, platformAccessory: PlatformAccessory) {
-    this._api = deviceHandler.platform.api;
-    this._log = deviceHandler.log;
+  setup(platformAccessory: PlatformAccessory, platform: ShellyPlatform, log: DeviceLogger) {
     this._platformAccessory = platformAccessory;
+    this._api = platform.api;
+    this._log = log;
 
-    this._service = this.setupService();
-    this.setupEventHandlers();
+    this.update();
   }
 
   /**
-   * Subclasses should use this method to setup their services and set default values for their
-   * characteristics.
+   * Sets `active` to the given value.
+   * This method can be used when chaining calls, as it returns a reference to `this`.
+   * @param value - Whether the ability should be active.
    */
-  protected abstract setupService(): Service;
+  setActive(value: boolean): this {
+    this.active = value;
+    return this;
+  }
 
   /**
-   * Returns a service of the given class.
-   * Use `name` and `subtype` to differentiate between multiple services of the same class.
-   * If the platform accessory has a matching service, it will be returned. Otherwise, the service will be added.
-   * @param cls - A service class.
-   * @param name - A name of the service.
-   * @param subtype - A unique identifier for this service.
+   * Determines whether this ability is active.
+   * The default implementation simply returns the value of the `active` property.
+   * Subclasses can override this method to add more conditions.
    */
-  protected getOrAddService(cls: WithUUID<typeof Service>, name?: string, subtype?: string): Service {
-    if (name && subtype) {
-      return this.platformAccessory.getService(name) || this.platformAccessory.addService(cls, name, subtype);
+  protected isActive(): boolean {
+    return this.active;
+  }
+
+  /**
+   * Updates this ability based on whether it is active.
+   * If active, its service will be added and initialized.
+   * If inactive, its service will be removed.
+   */
+  protected update() {
+    if (this._platformAccessory === null) {
+      // abort if setup() hasn't been called yet
+      return;
     }
-    return this.platformAccessory.getService(cls) || this.platformAccessory.addService(cls);
+
+    if (this.isActive()) {
+      // we're active, add and initialize our service
+      if (this._service === null) {
+        this._service = this.addService();
+        this.initialize();
+      }
+    } else {
+      // we're inactive, detach from and remove our service
+      if (this._service !== null) {
+        this.detach();
+      }
+
+      this.removeService();
+      this._service = null;
+    }
   }
 
   /**
-   * Subclasses should use this method to attach event listeners to the device and possibly also the
-   * platform accessory.
+   * Returns a service for this ability.
+   * If the platform accessory has a matching service, it will be returned. Otherwise, the service will be added.
    */
-  protected abstract setupEventHandlers();
+  protected addService(): Service {
+    if (this.serviceName && this.serviceSubtype) {
+      return this.platformAccessory.getService(this.serviceName)
+        || this.platformAccessory.addService(this.serviceClass, this.serviceName, this.serviceSubtype);
+    }
+
+    return this.platformAccessory.getService(this.serviceClass)
+      || this.platformAccessory.addService(this.serviceClass);
+  }
 
   /**
-   * Subclasses should use this method to remove all event listeners.
+   * Removes this ability's service from the platform accessory.
+   */
+  protected removeService() {
+    let service: Service | undefined;
+
+    // since the platform accessory may have been loaded from cache with a service created previously,
+    // we can't just rely on the _service property here
+    if (this._service !== null) {
+      service = this._service;
+    } else if (this.serviceName && this.serviceSubtype) {
+      service = this.platformAccessory.getService(this.serviceName);
+    } else {
+      service = this.platformAccessory.getService(this.serviceClass);
+    }
+
+    if (service) {
+      this.platformAccessory.removeService(service);
+    }
+  }
+
+  /**
+   * Subclasses should implement this method to return the HomeKit service type to use.
+   */
+  protected abstract get serviceClass(): ServiceClass;
+
+  /**
+   * Subclasses should use this method to initialize the service and attach their event listeners.
+   */
+  protected abstract initialize();
+
+  /**
+   * Subclasses should use this method to remove their event listeners.
    */
   abstract detach();
+
+  /**
+   * Removes all event listeners and all references to the platform accessory.
+   * This method is called by the parent accessory every time it becomes inactive.
+   * Note that this method doesn't remove the service from the platform accessory as it is assumed that
+   * the entire platform accessory is about to be unregistered and discarded.
+   */
+  destroy() {
+    this.detach();
+
+    this._platformAccessory = null;
+    this._api = null;
+    this._log = null;
+    this._service = null;
+  }
 }
