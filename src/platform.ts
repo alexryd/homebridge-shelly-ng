@@ -155,6 +155,8 @@ export class ShellyPlatform implements DynamicPlatformPlugin {
 
     // setup shellies-ng
     this.shellies = new Shellies({
+      autoLoadStatus: true,
+      autoLoadConfig: true,
       deviceOptions: this.options.deviceOptions,
     });
     this.shellies
@@ -339,10 +341,8 @@ export class ShellyPlatform implements DynamicPlatformPlugin {
 
     // if no name has been specified...
     if (!opts.name) {
-      // load the system configuration for this device
-      const sysConfig = await device.system.getConfig();
       // use the name from the API
-      opts.name = sysConfig.device?.name;
+      opts.name = device.system.config?.device?.name;
     }
 
     // create a handler for this device
