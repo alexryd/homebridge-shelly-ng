@@ -27,7 +27,7 @@ export class StatelessProgrammableSwitchAbility extends Ability {
     // set the index number for this switch
     this.service.setCharacteristic(
       this.Characteristic.ServiceLabelIndex,
-      this.component.id,
+      this.component.id + 1,
     );
 
     // listen for button press events
