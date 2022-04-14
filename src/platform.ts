@@ -155,6 +155,7 @@ export class ShellyPlatform implements DynamicPlatformPlugin {
 
     // setup shellies-ng
     this.shellies = new Shellies({
+      websocket: { ...this.options.websocket, clientId: 'homebridge-shelly-ng-' + Math.round(Math.random() * 1000000) },
       autoLoadStatus: true,
       autoLoadConfig: true,
       deviceOptions: this.options.deviceOptions,

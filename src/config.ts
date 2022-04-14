@@ -18,6 +18,39 @@ const DEFAULT_MDNS_OPTIONS: Readonly<MdnsOptions> = {
   enable: true,
 };
 
+export interface WebSocketOptions {
+  /**
+   * The time, in seconds, to wait for a response before a request is aborted.
+   */
+  requestTimeout: number;
+  /**
+   * The interval, in seconds, at which ping requests should be made to verify that the connection is open.
+   * Set to `0` to disable.
+   */
+  pingInterval: number;
+  /**
+   * The interval, in seconds, at which a connection attempt should be made after a socket has been closed.
+   * If an array is specified, the first value of the array will be used for the first connection attempt, the second
+   * value for the second attempt and so on. When the last item in the array has been reached, it will be used for
+   * all subsequent connection attempts; unless the value is `0`, in which case no more attempts will be made.
+   * Set to `0` or an empty array to disable.
+   */
+   reconnectInterval: number | number[];
+}
+
+const DEFAULT_WEB_SOCKET_OPTIONS: Readonly<WebSocketOptions> = {
+  requestTimeout: 10,
+  pingInterval: 60,
+  reconnectInterval: [
+    5,
+    10,
+    30,
+    60,
+    5 * 60, // 5 minutes
+    10 * 60, // 10 minutes
+  ],
+};
+
 export interface DeviceOptions {
   /**
    * The name of the device.
@@ -55,6 +88,10 @@ export class PlatformOptions {
    */
   readonly mdns: MdnsOptions;
   /**
+   * Options for WebSocket connections.
+   */
+  readonly websocket: WebSocketOptions;
+  /**
    * Device specific configuration options.
    */
   readonly deviceOptions: Map<DeviceId, DeviceOptions> = new Map();
@@ -65,6 +102,20 @@ export class PlatformOptions {
   constructor(config: PlatformConfig) {
     // store the mDNS options (with default values)
     this.mdns = { ...DEFAULT_MDNS_OPTIONS, ...config.mdns };
+
+    // allow websocket.reconnectInterval to be a string of comma-separated numbers
+    if (typeof config.websocket.reconnectInterval === 'string') {
+      const intervals: number[] = [];
+
+      for (const i of config.websocket.reconnectInterval.split(',')) {
+        intervals.push(parseInt(i, 10));
+      }
+
+      config.websocket.reconnectInterval = intervals;
+    }
+
+    // store the WebSocket options (with default values)
+    this.websocket = { ...DEFAULT_WEB_SOCKET_OPTIONS, ...config.websocket };
 
     // store the device options
     if (Array.isArray(config.devices)) {

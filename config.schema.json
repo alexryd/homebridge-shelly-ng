@@ -25,6 +25,27 @@
           }
         }
       },
+      "websocket": {
+        "type": "object",
+        "properties": {
+          "requestTimeout": {
+            "title": "Request timeout",
+            "type": "integer",
+            "description": "The time, in seconds, to wait for a response before a request is aborted."
+          },
+          "pingInterval": {
+            "title": "Ping interval",
+            "type": "integer",
+            "description": "The interval, in seconds, at which ping requests should be made to verify that the connection is open. Set to 0 to disable."
+          },
+          "reconnectInterval": {
+            "title": "Reconnect intervals",
+            "type": "string",
+            "placeholder": "e.g. 5,30,60",
+            "description": "The interval, in seconds, at which a connection attempt should be made after a socket has been closed. Multiple intervals can be specified as a comma-separated list of numbers. Set to 0 to disable."
+          }
+        }
+      },
       "devices": {
         "type": "array",
         "items": {
