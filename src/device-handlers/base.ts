@@ -60,6 +60,11 @@ export abstract class DeviceHandler {
   readonly log: DeviceLogger;
 
   /**
+   * Used to keep track of whether a connection had been established when the 'disconnect' event is emitted by our RPC handler.
+   */
+  protected connected: boolean;
+
+  /**
    * @param device - The device to handle.
    * @param options - Configuration options for the device.
    * @param platform - A reference to the homebridge platform.
@@ -69,6 +74,8 @@ export abstract class DeviceHandler {
     this.log.info('Device added');
 
     this.log.debug(device.rpcHandler.connected ? 'Device is connected' : 'Device is disconnected');
+
+    this.connected = device.rpcHandler.connected;
 
     device.rpcHandler
       .on('connect', this.handleConnect, this)
@@ -124,13 +131,31 @@ export abstract class DeviceHandler {
    */
   protected handleConnect() {
     this.log.info('Device connected');
+    this.connected = true;
   }
 
   /**
    * Handles 'disconnect' events from the RPC handler.
    */
-  protected handleDisconnect(code: number, reason: string) {
-    this.log.info(`Device disconnected (reason: ${reason})`);
+  protected handleDisconnect(code: number, reason: string, reconnectIn: number | null) {
+    const details = reason.length > 0 ? 'reason: ' + reason : 'code: ' + code;
+    this.log.warn((this.connected ? 'Device disconnected' : 'Connection failed') + ' (' + details + ')');
+
+    if (reconnectIn !== null) {
+      let msg = 'Reconnecting in ';
+
+      if (reconnectIn < 60 * 1000) {
+        msg += Math.floor(reconnectIn / 1000) + ' second(s)';
+      } else if (reconnectIn < 60 * 60 * 1000) {
+        msg += Math.floor(reconnectIn / (60 * 1000)) + ' minute(s)';
+      } else {
+        msg += Math.floor(reconnectIn / (60 * 60 * 1000)) + ' hour(s)';
+      }
+
+      this.log.info(msg);
+    }
+
+    this.connected = false;
   }
 
   /**
