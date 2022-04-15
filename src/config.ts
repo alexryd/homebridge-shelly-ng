@@ -104,7 +104,7 @@ export class PlatformOptions {
     this.mdns = { ...DEFAULT_MDNS_OPTIONS, ...config.mdns };
 
     // allow websocket.reconnectInterval to be a string of comma-separated numbers
-    if (typeof config.websocket.reconnectInterval === 'string') {
+    if (typeof config.websocket?.reconnectInterval === 'string') {
       const intervals: number[] = [];
 
       for (const i of config.websocket.reconnectInterval.split(',')) {
