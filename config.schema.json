@@ -16,12 +16,15 @@
         "properties": {
           "enable": {
             "title": "Enable",
+            "description": "Whether devices should be automatically discovered using mDNS.",
             "type": "boolean",
             "default": true
           },
           "interface": {
             "title": "Network interface",
-            "type": "string"
+            "description": "The network interface to use when sending and receiving mDNS packets. You probably don't need to use this setting unless you know what you're doing. If not specified, all available network interfaces will be used.",
+            "type": "string",
+            "placeholder": "e.g. eth0 or 192.168.1.100"
           }
         }
       },
@@ -31,17 +34,19 @@
           "requestTimeout": {
             "title": "Request timeout",
             "type": "integer",
+            "placeholder": "10",
             "description": "The time, in seconds, to wait for a response before a request is aborted."
           },
           "pingInterval": {
             "title": "Ping interval",
             "type": "integer",
+            "placeholder": "60",
             "description": "The interval, in seconds, at which ping requests should be made to verify that the connection is open. Set to 0 to disable."
           },
           "reconnectInterval": {
             "title": "Reconnect intervals",
             "type": "string",
-            "placeholder": "e.g. 5,30,60",
+            "placeholder": "5,10,30,60,300,600",
             "description": "The interval, in seconds, at which a connection attempt should be made after a socket has been closed. Multiple intervals can be specified as a comma-separated list of numbers. Set to 0 to disable."
           }
         }
@@ -54,21 +59,24 @@
           "properties": {
             "id": {
               "title": "Device ID",
+              "description": "See <a href='https://github.com/alexryd/homebridge-shelly-ng/wiki/Finding-a-device-ID' target='_blank'>this page</a> for instructions on how to find your device's ID.",
               "type": "string",
               "placeholder": "e.g. shellyplus1-abcdef123456",
               "required": true
             },
             "name": {
               "title": "Name",
+              "description": "This name will be shown in the homebridge log and will be used as the default name when the device is added to HomeKit. Note though that setting this value after the device has been added will not change the name in HomeKit.",
               "type": "string"
             },
             "exclude": {
-              "title": "Exclude",
+              "title": "Exclude this device",
               "type": "boolean",
               "default": false
             },
             "hostname": {
               "title": "IP address or hostname",
+              "description": "Set this value if your device can't be discovered automatically.",
               "type": "string",
               "placeholder": "e.g. 192.168.1.100"
             },
@@ -81,5 +89,58 @@
         }
       }
     }
-  }
+  },
+  "layout": [
+    "name",
+    {
+      "key": "devices",
+      "type": "array",
+      "title": "Devices",
+      "description": "Use these settings to configure individual devices. Note though that unless your devices can't be discovered using mDNS, you don't necessarily have to add them here manually.",
+      "items": [
+        "devices[].id",
+        "devices[].exclude",
+        {
+          "key": "devices[].name",
+          "condition": {
+            "functionBody": "return model.devices && !model.devices[arrayIndices[0]].exclude"
+          }
+        },
+        {
+          "key": "devices[].hostname",
+          "condition": {
+            "functionBody": "return model.devices && !model.devices[arrayIndices[0]].exclude"
+          }
+        },
+        {
+          "key": "devices[].password",
+          "condition": {
+            "functionBody": "return model.devices && !model.devices[arrayIndices[0]].exclude"
+          }
+        }
+      ]
+    },
+    {
+      "type": "fieldset",
+      "expandable": true,
+      "title": "mDNS device discovery",
+      "items": [
+        "mdns.enable",
+        {
+          "key": "mdns.interface",
+          "condition": "mdns.enable"
+        }
+      ]
+    },
+    {
+      "type": "fieldset",
+      "expandable": true,
+      "title": "WebSocket connections",
+      "items": [
+        "websocket.requestTimeout",
+        "websocket.pingInterval",
+        "websocket.reconnectInterval"
+      ]
+    }
+  ]
 }
