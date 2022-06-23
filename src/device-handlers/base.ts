@@ -15,6 +15,13 @@ export interface DeviceHandlerClass {
 }
 
 /**
+ * Describes a device class.
+ */
+export interface DeviceClass {
+  model: string;
+}
+
+/**
  * A DeviceHandler manages accessories for a device.
  */
 export abstract class DeviceHandler {
@@ -24,17 +31,17 @@ export abstract class DeviceHandler {
   private static readonly subclasses: Map<string, DeviceHandlerClass> = new Map();
 
   /**
-   * Registers a device handler, so that it can later be found based on its device model
+   * Registers a device handler, so that it can later be found based on its device class or model
    * using the `DeviceHandler.getClass()` method.
    * @param cls - A subclass of `DeviceHandler`.
-   * @param model - The device's model designation.
+   * @param deviceCls - A subclass of `Device`.
    */
-  static registerClass(cls: DeviceHandlerClass, model: string) {
-    const mdl = model.toUpperCase();
+  static registerClass(cls: DeviceHandlerClass, deviceCls: DeviceClass) {
+    const mdl = deviceCls.model.toUpperCase();
 
     // make sure it's not already registered
     if (DeviceHandler.subclasses.has(mdl)) {
-      throw new Error(`A device handler for ${model} has already been registered`);
+      throw new Error(`A device handler for ${deviceCls.model} has already been registered`);
     }
 
     // add it to the list
@@ -42,11 +49,12 @@ export abstract class DeviceHandler {
   }
 
   /**
-   * Returns the device handler for the given device model, if one has been registered.
-   * @param model - The model designation to lookup.
+   * Returns the device handler for the given device class or model, if one has been registered.
+   * @param deviceClsOrModel - The device class or model designation to lookup.
    */
-  static getClass(model: string): DeviceHandlerClass | undefined {
-    return DeviceHandler.subclasses.get(model.toUpperCase());
+  static getClass(deviceClsOrModel: DeviceClass | string): DeviceHandlerClass | undefined {
+    const mdl = typeof deviceClsOrModel === 'string' ? deviceClsOrModel : deviceClsOrModel.model;
+    return DeviceHandler.subclasses.get(mdl.toUpperCase());
   }
 
   /**

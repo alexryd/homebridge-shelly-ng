@@ -31,4 +31,4 @@ export class ShellyPro2PmHandler extends DeviceHandler {
   }
 }
 
-DeviceHandler.registerClass(ShellyPro2PmHandler, ShellyPro2Pm.model);
+DeviceHandler.registerClass(ShellyPro2PmHandler, ShellyPro2Pm);

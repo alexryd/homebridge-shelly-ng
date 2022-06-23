@@ -18,4 +18,4 @@ export class ShellyPlus1PmHandler extends DeviceHandler {
   }
 }
 
-DeviceHandler.registerClass(ShellyPlus1PmHandler, ShellyPlus1Pm.model);
+DeviceHandler.registerClass(ShellyPlus1PmHandler, ShellyPlus1Pm);

@@ -24,4 +24,4 @@ export class ShellyPro2Handler extends DeviceHandler {
   }
 }
 
-DeviceHandler.registerClass(ShellyPro2Handler, ShellyPro2.model);
+DeviceHandler.registerClass(ShellyPro2Handler, ShellyPro2);

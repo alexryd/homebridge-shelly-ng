@@ -39,4 +39,4 @@ export class ShellyPlusI4Handler extends DeviceHandler {
   }
 }
 
-DeviceHandler.registerClass(ShellyPlusI4Handler, ShellyPlusI4.model);
+DeviceHandler.registerClass(ShellyPlusI4Handler, ShellyPlusI4);
