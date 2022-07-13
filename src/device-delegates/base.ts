@@ -1,7 +1,12 @@
-import { Device } from 'shellies-ng';
+import { Device, Switch } from 'shellies-ng';
 import { PlatformAccessory } from 'homebridge';
 
-import { Ability, AccessoryInformationAbility } from '../abilities';
+import {
+  Ability,
+  AccessoryInformationAbility,
+  PowerMeterAbility,
+  SwitchAbility,
+} from '../abilities';
 import { Accessory, AccessoryId } from '../accessory';
 import { DeviceLogger } from '../utils/device-logger';
 import { DeviceOptions } from '../config';
@@ -132,6 +137,24 @@ export abstract class DeviceDelegate {
     this.accessories.set(id, accessory);
 
     return accessory;
+  }
+
+  /**
+   * Creates a switch accessory.
+   * @param swtch - The switch component to use.
+   * @param single - Whether the device has a single switch.
+   */
+  protected createSwitch(swtch: Switch, single = false): Accessory {
+    const id = single ? 'switch' : `switch-${swtch.id}`;
+    const nameSuffix = single ? null : `Switch ${swtch.id + 1}`;
+
+    return this.createAccessory(
+      id,
+      nameSuffix,
+      new SwitchAbility(swtch),
+      // use the apower property to determine whether power metering is available
+      new PowerMeterAbility(swtch).setActive(swtch.apower !== undefined),
+    );
   }
 
   /**
