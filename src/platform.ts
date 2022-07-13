@@ -154,7 +154,7 @@ export class ShellyPlatform implements DynamicPlatformPlugin {
   /**
    * This constructor is invoked by homebridge.
    * @param log - A logging device for this platform.
-   * @param config - Cobfiguration options for this platform.
+   * @param config - Configuration options for this platform.
    * @param api - A reference to the homebridge API.
    */
   constructor(
