@@ -6,6 +6,8 @@ import {
   WithUUID,
 } from 'homebridge';
 
+import { CustomCharacteristics } from '../utils/characteristics';
+import { CustomServices } from '../utils/services';
 import { DeviceLogger } from '../utils/device-logger';
 import { ShellyPlatform } from '../platform';
 
@@ -28,30 +30,51 @@ export abstract class Ability {
     return this._platformAccessory;
   }
 
-  private _api: API | null = null;
+  private _platform: ShellyPlatform | null = null;
+
+  /**
+   * A reference to the platform.
+   */
+  protected get platform(): ShellyPlatform {
+    if (this._platform === null) {
+      throw new Error('Ability has not yet been setup');
+    }
+    return this._platform;
+  }
 
   /**
    * A reference to the homebridge API.
    */
   protected get api(): API {
-    if (this._api === null) {
-      throw new Error('Ability has not yet been setup');
-    }
-    return this._api;
-  }
-
-  /**
-   * Shorthand property.
-   */
-  protected get Service(): typeof Service {
-    return this.api.hap.Service;
+    return this.platform.api;
   }
 
   /**
    * Shorthand property.
    */
   protected get Characteristic(): typeof Characteristic {
-    return this.api.hap.Characteristic;
+    return this.platform.api.hap.Characteristic;
+  }
+
+  /**
+   * Shorthand property.
+   */
+  protected get Service(): typeof Service {
+    return this.platform.api.hap.Service;
+  }
+
+  /**
+   * Shorthand property.
+   */
+  protected get customCharacteristics(): CustomCharacteristics {
+    return this.platform.customCharacteristics;
+  }
+
+  /**
+   * Shorthand property.
+   */
+  protected get customServices(): CustomServices {
+    return this.platform.customServices;
   }
 
   private _log: DeviceLogger | null = null;
@@ -115,7 +138,7 @@ export abstract class Ability {
    */
   setup(platformAccessory: PlatformAccessory, platform: ShellyPlatform, log: DeviceLogger) {
     this._platformAccessory = platformAccessory;
-    this._api = platform.api;
+    this._platform = platform;
     this._log = log;
 
     this.update();
@@ -204,6 +227,21 @@ export abstract class Ability {
   }
 
   /**
+   * Helper method that removes a characteristic based on its class (Service.removeCharacteristic()
+   * only accepts an instance).
+   * @param characteristic - The characteristic to remove.
+   */
+  protected removeCharacteristic(characteristic: WithUUID<new () => Characteristic> & WithUUID<typeof Characteristic>) {
+    const s = this.service;
+
+    // getCharacteristic() will add the characteristic if it doesn't exist, so we need to use testCharacteristic() to avoid
+    // adding and then immediately removing it
+    if (s.testCharacteristic(characteristic)) {
+      s.removeCharacteristic(s.getCharacteristic(characteristic));
+    }
+  }
+
+  /**
    * Subclasses should implement this method to return the HomeKit service type to use.
    */
   protected abstract get serviceClass(): ServiceClass;
@@ -228,7 +266,7 @@ export abstract class Ability {
     this.detach();
 
     this._platformAccessory = null;
-    this._api = null;
+    this._platform = null;
     this._log = null;
     this._service = null;
   }
