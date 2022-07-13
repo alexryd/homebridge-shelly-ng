@@ -15,6 +15,8 @@ import {
   Shellies,
 } from 'shellies-ng';
 
+import { CustomCharacteristics, createCharacteristics } from './utils/characteristics';
+import { CustomServices, createServices } from './utils/services';
 import { DeviceCache } from './utils/device-cache';
 import { DeviceHandler } from './device-handlers';
 import { PlatformOptions } from './config';
@@ -119,6 +121,16 @@ export class ShellyPlatform implements DynamicPlatformPlugin {
   readonly options: PlatformOptions;
 
   /**
+   * A set of custom HomeKit characteristics.
+   */
+  readonly customCharacteristics: CustomCharacteristics;
+
+  /**
+   * A set of custom HomeKit services.
+   */
+  readonly customServices: CustomServices;
+
+  /**
    * A reference to the shellies-ng library.
    */
   protected readonly shellies: Shellies;
@@ -152,6 +164,9 @@ export class ShellyPlatform implements DynamicPlatformPlugin {
   ) {
     // get the platform options
     this.options = new PlatformOptions(config);
+
+    this.customCharacteristics = Object.freeze(createCharacteristics(api));
+    this.customServices = Object.freeze(createServices(api, this.customCharacteristics));
 
     // setup shellies-ng
     this.shellies = new Shellies({
