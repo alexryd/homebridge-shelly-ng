@@ -1,12 +1,12 @@
 import { ShellyPro2Pm } from 'shellies-ng';
 
-import { DeviceHandler } from './base';
+import { DeviceDelegate } from './base';
 import { CoverAbility, SwitchAbility } from '../abilities';
 
 /**
  * Handles Shelly Pro 2 PM devices.
  */
-export class ShellyPro2PmHandler extends DeviceHandler {
+export class ShellyPro2PmDelegate extends DeviceDelegate {
   protected setup() {
     const d = this.device as ShellyPro2Pm;
     const isCover = d.profile === 'cover';
@@ -31,4 +31,4 @@ export class ShellyPro2PmHandler extends DeviceHandler {
   }
 }
 
-DeviceHandler.registerClass(ShellyPro2PmHandler, ShellyPro2Pm);
+DeviceDelegate.registerClass(ShellyPro2PmDelegate, ShellyPro2Pm);

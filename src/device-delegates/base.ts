@@ -8,10 +8,10 @@ import { DeviceOptions } from '../config';
 import { ShellyPlatform } from '../platform';
 
 /**
- * Describes a device handler class.
+ * Describes a device delegate class.
  */
-export interface DeviceHandlerClass {
-  new (device: Device, options: DeviceOptions, platform: ShellyPlatform): DeviceHandler;
+export interface DeviceDelegateClass {
+  new (device: Device, options: DeviceOptions, platform: ShellyPlatform): DeviceDelegate;
 }
 
 /**
@@ -22,39 +22,39 @@ export interface DeviceClass {
 }
 
 /**
- * A DeviceHandler manages accessories for a device.
+ * A DeviceDelegate manages accessories for a device.
  */
-export abstract class DeviceHandler {
+export abstract class DeviceDelegate {
   /**
    * Holds all registered subclasses.
    */
-  private static readonly subclasses: Map<string, DeviceHandlerClass> = new Map();
+  private static readonly subclasses: Map<string, DeviceDelegateClass> = new Map();
 
   /**
-   * Registers a device handler, so that it can later be found based on its device class or model
-   * using the `DeviceHandler.getClass()` method.
-   * @param cls - A subclass of `DeviceHandler`.
+   * Registers a device delegate, so that it can later be found based on its device class or model
+   * using the `DeviceDelegate.getClass()` method.
+   * @param cls - A subclass of `DeviceDelegate`.
    * @param deviceCls - A subclass of `Device`.
    */
-  static registerClass(cls: DeviceHandlerClass, deviceCls: DeviceClass) {
+  static registerClass(cls: DeviceDelegateClass, deviceCls: DeviceClass) {
     const mdl = deviceCls.model.toUpperCase();
 
     // make sure it's not already registered
-    if (DeviceHandler.subclasses.has(mdl)) {
-      throw new Error(`A device handler for ${deviceCls.model} has already been registered`);
+    if (DeviceDelegate.subclasses.has(mdl)) {
+      throw new Error(`A device delegate for ${deviceCls.model} has already been registered`);
     }
 
     // add it to the list
-    DeviceHandler.subclasses.set(mdl, cls);
+    DeviceDelegate.subclasses.set(mdl, cls);
   }
 
   /**
-   * Returns the device handler for the given device class or model, if one has been registered.
+   * Returns the device delegate for the given device class or model, if one has been registered.
    * @param deviceClsOrModel - The device class or model designation to lookup.
    */
-  static getClass(deviceClsOrModel: DeviceClass | string): DeviceHandlerClass | undefined {
+  static getClass(deviceClsOrModel: DeviceClass | string): DeviceDelegateClass | undefined {
     const mdl = typeof deviceClsOrModel === 'string' ? deviceClsOrModel : deviceClsOrModel.model;
-    return DeviceHandler.subclasses.get(mdl.toUpperCase());
+    return DeviceDelegate.subclasses.get(mdl.toUpperCase());
   }
 
   /**
@@ -94,7 +94,7 @@ export abstract class DeviceHandler {
   }
 
   /**
-   * Subclasses should override this method to setup the device handler and create their
+   * Subclasses should override this method to setup the device delegate and create their
    * accessories.
    */
   protected abstract setup();
@@ -189,7 +189,7 @@ export abstract class DeviceHandler {
   }
 
   /**
-   * Destroys this device handler, removing all event listeners and unregistering all accessories.
+   * Destroys this device delegate, removing all event listeners and unregistering all accessories.
    */
   destroy() {
     this.detach();

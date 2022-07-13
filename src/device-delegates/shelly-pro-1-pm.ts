@@ -1,12 +1,12 @@
 import { ShellyPro1Pm } from 'shellies-ng';
 
-import { DeviceHandler } from './base';
+import { DeviceDelegate } from './base';
 import { SwitchAbility } from '../abilities';
 
 /**
  * Handles Shelly Pro 1 PM devices.
  */
-export class ShellyPro1PmHandler extends DeviceHandler {
+export class ShellyPro1PmDelegate extends DeviceDelegate {
   protected setup() {
     const d = this.device as ShellyPro1Pm;
 
@@ -18,4 +18,4 @@ export class ShellyPro1PmHandler extends DeviceHandler {
   }
 }
 
-DeviceHandler.registerClass(ShellyPro1PmHandler, ShellyPro1Pm);
+DeviceDelegate.registerClass(ShellyPro1PmDelegate, ShellyPro1Pm);

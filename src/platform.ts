@@ -18,7 +18,7 @@ import {
 import { CustomCharacteristics, createCharacteristics } from './utils/characteristics';
 import { CustomServices, createServices } from './utils/services';
 import { DeviceCache } from './utils/device-cache';
-import { DeviceHandler } from './device-handlers';
+import { DeviceDelegate } from './device-delegates';
 import { PlatformOptions } from './config';
 
 type AccessoryUuid = string;
@@ -147,9 +147,9 @@ export class ShellyPlatform implements DynamicPlatformPlugin {
   readonly deviceCache: DeviceCache;
 
   /**
-   * Holds all device handlers.
+   * Holds all device delegates.
    */
-  readonly deviceHandlers: Map<DeviceId, DeviceHandler> = new Map();
+  readonly deviceDelegates: Map<DeviceId, DeviceDelegate> = new Map();
 
   /**
    * This constructor is invoked by homebridge.
@@ -339,13 +339,13 @@ export class ShellyPlatform implements DynamicPlatformPlugin {
    */
   protected async handleAddedDevice(device: Device) {
     // make sure this device hasn't already been added
-    if (this.deviceHandlers.has(device.id)) {
+    if (this.deviceDelegates.has(device.id)) {
       this.log.error(`Device with ID ${device.id} has already been added`);
       return;
     }
 
-    // get the device handler class for this device
-    const cls = DeviceHandler.getClass(device.model);
+    // get the device delegate class for this device
+    const cls = DeviceDelegate.getClass(device.model);
     if (cls === undefined) {
       // this is an unknown device
       this.handleUnknownDevice(device.id, device.model);
@@ -361,11 +361,11 @@ export class ShellyPlatform implements DynamicPlatformPlugin {
       opts.name = device.system.config?.device?.name;
     }
 
-    // create a handler for this device
-    const handler = new cls(device, opts, this);
+    // create a delegate for this device
+    const delegate = new cls(device, opts, this);
 
-    // store the handler
-    this.deviceHandlers.set(device.id, handler);
+    // store the delegate
+    this.deviceDelegates.set(device.id, delegate);
 
     // store info about this device in cache
     this.deviceCache.storeDevice(device);
@@ -375,9 +375,9 @@ export class ShellyPlatform implements DynamicPlatformPlugin {
    * Handles 'remove' events from the shellies-ng library.
    */
   protected handleRemovedDevice(device: Device) {
-    // destroy and remove the device handler
-    this.deviceHandlers.get(device.id)?.destroy();
-    this.deviceHandlers.delete(device.id);
+    // destroy and remove the device delegate
+    this.deviceDelegates.get(device.id)?.destroy();
+    this.deviceDelegates.delete(device.id);
 
     // delete this device from cache
     this.deviceCache.delete(device.id);
@@ -392,10 +392,10 @@ export class ShellyPlatform implements DynamicPlatformPlugin {
     // delete this device from cache
     this.deviceCache.delete(deviceId);
 
-    if (this.deviceHandlers.has(deviceId)) {
-      // destroy and remove the device handler
-      this.deviceHandlers.get(deviceId)!.destroy();
-      this.deviceHandlers.delete(deviceId);
+    if (this.deviceDelegates.has(deviceId)) {
+      // destroy and remove the device delegate
+      this.deviceDelegates.get(deviceId)!.destroy();
+      this.deviceDelegates.delete(deviceId);
     } else {
       // find all of its platform accessories
       const pas: PlatformAccessory[] = [];

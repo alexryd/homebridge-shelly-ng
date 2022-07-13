@@ -1,6 +1,6 @@
 import { ShellyPlusI4 } from 'shellies-ng';
 
-import { DeviceHandler } from './base';
+import { DeviceDelegate } from './base';
 import {
   ReadonlySwitchAbility,
   ServiceLabelAbility,
@@ -10,7 +10,7 @@ import {
 /**
  * Handles Shelly Plus I4 devices.
  */
-export class ShellyPlusI4Handler extends DeviceHandler {
+export class ShellyPlusI4Delegate extends DeviceDelegate {
   protected setup() {
     const d = this.device as ShellyPlusI4;
 
@@ -39,4 +39,4 @@ export class ShellyPlusI4Handler extends DeviceHandler {
   }
 }
 
-DeviceHandler.registerClass(ShellyPlusI4Handler, ShellyPlusI4);
+DeviceDelegate.registerClass(ShellyPlusI4Delegate, ShellyPlusI4);
