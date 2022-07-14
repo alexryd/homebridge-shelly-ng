@@ -1,9 +1,10 @@
-import { Device, Switch } from 'shellies-ng';
+import { Cover, Device, Switch } from 'shellies-ng';
 import { PlatformAccessory } from 'homebridge';
 
 import {
   Ability,
   AccessoryInformationAbility,
+  CoverAbility,
   PowerMeterAbility,
   SwitchAbility,
 } from '../abilities';
@@ -154,6 +155,19 @@ export abstract class DeviceDelegate {
       new SwitchAbility(swtch),
       // use the apower property to determine whether power metering is available
       new PowerMeterAbility(swtch).setActive(swtch.apower !== undefined),
+    );
+  }
+
+  /**
+   * Creates a cover accessory.
+   * @param cover - The cover component to use.
+   */
+  protected createCover(cover: Cover): Accessory {
+    return this.createAccessory(
+      'cover',
+      'Window',
+      new CoverAbility(cover, 'window'),
+      new PowerMeterAbility(cover),
     );
   }
 

@@ -1,7 +1,6 @@
 import { ShellyPlus2Pm } from 'shellies-ng';
 
 import { DeviceDelegate } from './base';
-import { CoverAbility } from '../abilities';
 
 /**
  * Handles Shelly Plus 2 PM devices.
@@ -11,11 +10,7 @@ export class ShellyPlus2PmDelegate extends DeviceDelegate {
     const d = this.device as ShellyPlus2Pm;
     const isCover = d.profile === 'cover';
 
-    this.createAccessory(
-      'cover',
-      'Window',
-      new CoverAbility(d.cover0, 'window'),
-    ).setActive(isCover);
+    this.createCover(d.cover0).setActive(isCover);
 
     this.createSwitch(d.switch0).setActive(!isCover);
     this.createSwitch(d.switch1).setActive(!isCover);
