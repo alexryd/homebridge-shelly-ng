@@ -1,5 +1,6 @@
 import {
   CharacteristicValue as ShelliesCharacteristicValue,
+  Cover,
   Switch,
   SwitchEnergyCounterAttributes,
 } from 'shellies-ng';
@@ -11,9 +12,9 @@ import { Ability, ServiceClass } from './base';
  */
 export class PowerMeterAbility extends Ability {
   /**
-   * @param component - The switch component to get readings from.
+   * @param component - The switch or cover component to get readings from.
    */
-  constructor(readonly component: Switch) {
+  constructor(readonly component: Switch | Cover) {
     super(
       `Power Meter ${component.id + 1}`,
       `power-meter-${component.id}`,
