@@ -39,7 +39,7 @@
     "@typescript-eslint/eslint-plugin": "^5.28.0",
     "@typescript-eslint/parser": "^5.28.0",
     "eslint": "^8.18.0",
-    "homebridge": "^1.4.1",
+    "homebridge": "^1.5.0",
     "jest": "^28.1.1",
     "rimraf": "^3.0.2",
     "ts-jest": "^28.0.5",
