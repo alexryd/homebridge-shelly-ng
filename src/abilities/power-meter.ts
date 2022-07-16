@@ -66,7 +66,7 @@ export class PowerMeterAbility extends Ability {
     if (c.aenergy !== undefined) {
       s.setCharacteristic(
         cc.TotalConsumption,
-        c.aenergy.total,
+        c.aenergy.total / 1000,
       );
 
       c.on('change:aenergy', this.aenergyChangeHandler, this);
@@ -121,7 +121,7 @@ export class PowerMeterAbility extends Ability {
 
     this.service.updateCharacteristic(
       this.customCharacteristics.TotalConsumption,
-      attr.total,
+      attr.total / 1000,
     );
   }
 }
