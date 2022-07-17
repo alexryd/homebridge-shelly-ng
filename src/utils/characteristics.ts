@@ -79,8 +79,8 @@ export const createCharacteristics = (api: API): CustomCharacteristics => {
         format: api.hap.Formats.FLOAT,
         perms: [api.hap.Perms.NOTIFY, api.hap.Perms.READ],
         unit: 'V',
-        minValue: 0,
-        maxValue: 250,
+        minValue: -1000,
+        maxValue: 1000,
         minStep: 0.1,
       });
     }
