@@ -53,7 +53,8 @@ The following configuration options are available. Note that they are all option
       "name": "My Device",
       "exclude": false,
       "hostname": "e.g. 192.168.1.200",
-      "password": "pa$$word"
+      "password": "pa$$word",
+      "coverType": "windowCovering"
     }
   ],
   "mdns": {
@@ -78,6 +79,7 @@ See below for descriptions of each configuration option.
 | `devices. exclude`              | Set this value to `true` to make this plugin ignore this device. |
 | `devices. hostname`             | The IP address or hostname of the device. Set this value if your device can't be discovered automatically. |
 | `devices. password`             | The password to use if authentication has been enabled for the device.
+| `devices. coverType`             | The type of device that is shown in Homekit, when the Shelly is in cover mode. Possible values: "awning, "door", "window", "windowCovering" |
 | `mdns`                          | Settings for the mDNS device discovery service. |
 | `mdns. enable`                  | Set this value to `false` to disable automatic device discovery using mDNS. |
 | `mdns. interface`               | The network interface to use when sending and receiving mDNS packets. You probably don't need to use this setting unless you know what you're doing. If not specified, all available network interfaces will be used. |

@@ -163,12 +163,15 @@ export abstract class DeviceDelegate {
    * @param cover - The cover component to use.
    */
   protected createCover(cover: Cover): Accessory {
-    return this.createAccessory(
-      'cover',
-      'Window',
-      new CoverAbility(cover, 'window'),
-      new PowerMeterAbility(cover),
-    );
+    if (this.options.coverType === 'awning') {
+      return this.createAccessory('cover', 'Awning', new CoverAbility(cover, 'awning'), new PowerMeterAbility(cover));
+    } else if (this.options.coverType === 'door') {
+      return this.createAccessory('cover', 'Door', new CoverAbility(cover, 'door'), new PowerMeterAbility(cover));
+    } else if (this.options.coverType === 'window') {
+      return this.createAccessory('cover', 'Window', new CoverAbility(cover, 'window'), new PowerMeterAbility(cover));
+    } else {
+      return this.createAccessory('cover', 'Window Covering', new CoverAbility(cover, 'windowCovering'), new PowerMeterAbility(cover));
+    }
   }
 
   /**

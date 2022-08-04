@@ -84,6 +84,17 @@
               "title": "Password",
               "type": "string",
               "description": "The password to use if the Shelly device requires authentication."
+            },
+            "coverType": {
+              "title": "Cover type",
+              "type": "string",
+              "description": "If Shelly is in cover mode, choose how it should appear in HomeKit. This is only relevant if the device is in cover mode, otherwise it will be ignored. Default is Windows Covering.",
+              "oneOf": [
+                { "title": "Awning", "enum": ["awning"] },
+                { "title": "Door", "enum": ["door"] },
+                { "title": "Window", "enum": ["window"] },
+                { "title": "Window cover", "enum": ["windowCovering"] }
+              ]
             }
           }
         }
@@ -114,6 +125,12 @@
         },
         {
           "key": "devices[].password",
+          "condition": {
+            "functionBody": "return model.devices && !model.devices[arrayIndices[0]].exclude"
+          }
+        },
+        {
+          "key": "devices[].coverType",
           "condition": {
             "functionBody": "return model.devices && !model.devices[arrayIndices[0]].exclude"
           }

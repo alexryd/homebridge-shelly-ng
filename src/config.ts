@@ -72,6 +72,10 @@ export interface DeviceOptions {
    * The password to use if the Shelly device requires authentication.
    */
   password?: string;
+   /**
+   * The homekit device type used, when the Shelly device is in cover mode.
+   */
+  coverType?: string;
 }
 
 const DEFAULT_DEVICE_OPTIONS: Readonly<DeviceOptions> = {

@@ -4,6 +4,7 @@ import { Cover } from 'shellies-ng';
 import { Ability, ServiceClass } from './base';
 
 const names = {
+  'awning': 'Awning',
   'door': 'Door',
   'window': 'Window',
   'windowCovering': 'Window Covering',
@@ -13,7 +14,7 @@ export class CoverAbility extends Ability {
   /**
    * @param component - The cover component to control.
    */
-  constructor(readonly component: Cover, readonly type: 'door' | 'window' | 'windowCovering' = 'window') {
+  constructor(readonly component: Cover, readonly type: 'awning' | 'door' | 'window' | 'windowCovering' = 'windowCovering') {
     super(
       `${names[type]} ${component.id + 1}`,
       `${type}-${component.id}`,
