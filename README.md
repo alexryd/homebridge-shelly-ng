@@ -20,6 +20,7 @@ For the first generation, see [homebridge-shelly](https://github.com/alexryd/hom
 * [Shelly Pro 1 PM](https://shelly.cloud/shelly-pro-smart-home-automation-solution/)
 * [Shelly Pro 2](https://shelly.cloud/shelly-pro-smart-home-automation-solution/)
 * [Shelly Pro 2 PM](https://shelly.cloud/shelly-pro-smart-home-automation-solution/)
+* [Shelly Pro 3](https://shelly.cloud/shelly-pro-smart-home-automation-solution/)
 * [Shelly Pro 4 PM](https://shelly.cloud/shelly-pro-smart-home-automation-solution/)
 
 ## Installation
