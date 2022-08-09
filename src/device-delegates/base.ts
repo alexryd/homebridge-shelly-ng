@@ -32,35 +32,37 @@ export interface DeviceClass {
  */
 export abstract class DeviceDelegate {
   /**
-   * Holds all registered subclasses.
+   * Holds all registered delegates.
    */
-  private static readonly subclasses: Map<string, DeviceDelegateClass> = new Map();
+  private static readonly delegates: Map<string, DeviceDelegateClass> = new Map();
 
   /**
-   * Registers a device delegate, so that it can later be found based on its device class or model
-   * using the `DeviceDelegate.getClass()` method.
-   * @param cls - A subclass of `DeviceDelegate`.
-   * @param deviceCls - A subclass of `Device`.
+   * Registers a device delegate, so that it can later be found based on a device class or model
+   * using the `DeviceDelegate.getDelegate()` method.
+   * @param delegate - A subclass of `DeviceDelegate`.
+   * @param deviceClasses - One or more subclasses of `Device`.
    */
-  static registerClass(cls: DeviceDelegateClass, deviceCls: DeviceClass) {
-    const mdl = deviceCls.model.toUpperCase();
+  static registerDelegate(delegate: DeviceDelegateClass, ...deviceClasses: DeviceClass[]) {
+    for (const deviceCls of deviceClasses) {
+      const mdl = deviceCls.model.toUpperCase();
 
-    // make sure it's not already registered
-    if (DeviceDelegate.subclasses.has(mdl)) {
-      throw new Error(`A device delegate for ${deviceCls.model} has already been registered`);
+      // make sure it's not already registered
+      if (DeviceDelegate.delegates.has(mdl)) {
+        throw new Error(`A device delegate for ${deviceCls.model} has already been registered`);
+      }
+
+      // add it to the list
+      DeviceDelegate.delegates.set(mdl, delegate);
     }
-
-    // add it to the list
-    DeviceDelegate.subclasses.set(mdl, cls);
   }
 
   /**
    * Returns the device delegate for the given device class or model, if one has been registered.
-   * @param deviceClsOrModel - The device class or model designation to lookup.
+   * @param deviceClsOrModel - The device class or model ID to lookup.
    */
-  static getClass(deviceClsOrModel: DeviceClass | string): DeviceDelegateClass | undefined {
+  static getDelegate(deviceClsOrModel: DeviceClass | string): DeviceDelegateClass | undefined {
     const mdl = typeof deviceClsOrModel === 'string' ? deviceClsOrModel : deviceClsOrModel.model;
-    return DeviceDelegate.subclasses.get(mdl.toUpperCase());
+    return DeviceDelegate.delegates.get(mdl.toUpperCase());
   }
 
   /**

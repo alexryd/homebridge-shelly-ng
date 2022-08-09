@@ -14,4 +14,4 @@ export class ShellyPro2Delegate extends DeviceDelegate {
   }
 }
 
-DeviceDelegate.registerClass(ShellyPro2Delegate, ShellyPro2);
+DeviceDelegate.registerDelegate(ShellyPro2Delegate, ShellyPro2);

@@ -345,7 +345,7 @@ export class ShellyPlatform implements DynamicPlatformPlugin {
     }
 
     // get the device delegate class for this device
-    const cls = DeviceDelegate.getClass(device.model);
+    const cls = DeviceDelegate.getDelegate(device.model);
     if (cls === undefined) {
       // this is an unknown device
       this.handleUnknownDevice(device.id, device.model);

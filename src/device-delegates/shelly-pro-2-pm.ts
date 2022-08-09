@@ -17,4 +17,4 @@ export class ShellyPro2PmDelegate extends DeviceDelegate {
   }
 }
 
-DeviceDelegate.registerClass(ShellyPro2PmDelegate, ShellyPro2Pm);
+DeviceDelegate.registerDelegate(ShellyPro2PmDelegate, ShellyPro2Pm);

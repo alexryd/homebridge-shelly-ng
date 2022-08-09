@@ -13,4 +13,4 @@ export class ShellyPlus1PmDelegate extends DeviceDelegate {
   }
 }
 
-DeviceDelegate.registerClass(ShellyPlus1PmDelegate, ShellyPlus1Pm);
+DeviceDelegate.registerDelegate(ShellyPlus1PmDelegate, ShellyPlus1Pm);
