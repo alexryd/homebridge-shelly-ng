@@ -1,4 +1,4 @@
-import { Cover, Device, Switch } from 'shellies-ng';
+import { ComponentLike, Cover, Device, Switch } from 'shellies-ng';
 import { PlatformAccessory } from 'homebridge';
 
 import {
@@ -106,6 +106,15 @@ export abstract class DeviceDelegate {
    * accessories.
    */
   protected abstract setup();
+
+  /**
+   * Retrieves configuration options for the given component from the device options.
+   * @param component - The component.
+   * @returns A set of options, if found.
+   */
+  protected getComponentOptions<T>(component: ComponentLike): T | undefined {
+    return this.options?.[component.key] as T;
+  }
 
   /**
    * Creates an accessory with the given ID.
