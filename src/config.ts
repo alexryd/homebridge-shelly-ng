@@ -35,7 +35,7 @@ export interface WebSocketOptions {
    * all subsequent connection attempts; unless the value is `0`, in which case no more attempts will be made.
    * Set to `0` or an empty array to disable.
    */
-   reconnectInterval: number | number[];
+  reconnectInterval: number | number[];
 }
 
 const DEFAULT_WEB_SOCKET_OPTIONS: Readonly<WebSocketOptions> = {
