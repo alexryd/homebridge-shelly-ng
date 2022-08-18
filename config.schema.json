@@ -84,6 +84,23 @@
               "title": "Password",
               "type": "string",
               "description": "The password to use if the Shelly device requires authentication."
+            },
+            "cover:0": {
+              "title": "Cover",
+              "type": "object",
+              "properties": {
+                "type": {
+                  "title": "Type",
+                  "description": "The type of accessory used to represent the cover. This setting apply only when the device is in cover mode.",
+                  "type": "string",
+                  "oneOf": [
+                    { "title": "Door", "enum": [ "door" ] },
+                    { "title": "Window", "enum": [ "window" ] },
+                    { "title": "Window Covering", "enum": [ "windowCovering" ] }
+                  ],
+                  "default": "window"
+                }
+              }
             }
           }
         }
@@ -117,6 +134,15 @@
           "condition": {
             "functionBody": "return model.devices && !model.devices[arrayIndices[0]].exclude"
           }
+        },
+        {
+          "key": "devices[].cover:0",
+          "condition": {
+            "functionBody": "return model.devices && !model.devices[arrayIndices[0]].exclude && (model.devices[arrayIndices[0]].id.substr(0, 13).toLowerCase() === 'shellyplus2pm' || model.devices[arrayIndices[0]].id.substr(0, 12).toLowerCase() === 'shellypro2pm')"
+          },
+          "items": [
+            "devices[].cover:0.type"
+          ]
         }
       ]
     },

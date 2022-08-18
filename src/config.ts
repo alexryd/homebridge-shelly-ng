@@ -51,6 +51,13 @@ const DEFAULT_WEB_SOCKET_OPTIONS: Readonly<WebSocketOptions> = {
   ],
 };
 
+export interface CoverOptions {
+  /**
+   * The type of accessory used to represent the cover.
+   */
+  type?: 'door' | 'window' | 'windowCovering';
+}
+
 export interface DeviceOptions {
   /**
    * The name of the device.
@@ -72,6 +79,10 @@ export interface DeviceOptions {
    * The password to use if the Shelly device requires authentication.
    */
   password?: string;
+  /**
+   * Options for devices that have a cover.
+   */
+  [ 'cover:0' ]?: CoverOptions;
 }
 
 const DEFAULT_DEVICE_OPTIONS: Readonly<DeviceOptions> = {

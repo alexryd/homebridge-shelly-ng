@@ -10,7 +10,7 @@ import {
 } from '../abilities';
 import { Accessory, AccessoryId } from '../accessory';
 import { DeviceLogger } from '../utils/device-logger';
-import { DeviceOptions } from '../config';
+import { CoverOptions, DeviceOptions } from '../config';
 import { ShellyPlatform } from '../platform';
 
 /**
@@ -174,10 +174,18 @@ export abstract class DeviceDelegate {
    * @param cover - The cover component to use.
    */
   protected createCover(cover: Cover): Accessory {
+    // get the config options for this cover and determine its type
+    const opts = this.getComponentOptions<CoverOptions>(cover);
+    const type = opts && typeof opts.type === 'string' ? opts.type.toLowerCase() : 'window';
+    const isDoor = type === 'door';
+    const isWindowCovering = type === 'windowcovering';
+
     return this.createAccessory(
       'cover',
-      'Window',
-      new CoverAbility(cover, 'window'),
+      'Cover',
+      new CoverAbility(cover, 'door').setActive(isDoor),
+      new CoverAbility(cover, 'windowCovering').setActive(isWindowCovering),
+      new CoverAbility(cover, 'window').setActive(!isDoor && !isWindowCovering),
       new PowerMeterAbility(cover),
     );
   }
