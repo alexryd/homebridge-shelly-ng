@@ -51,6 +51,13 @@ const DEFAULT_WEB_SOCKET_OPTIONS: Readonly<WebSocketOptions> = {
   ],
 };
 
+export interface SwitchOptions {
+  /**
+   * Whether this switch should be excluded.
+   */
+  exclude?: boolean;
+}
+
 export interface CoverOptions {
   /**
    * Whether this cover should be excluded.
@@ -83,6 +90,22 @@ export interface DeviceOptions {
    * The password to use if the Shelly device requires authentication.
    */
   password?: string;
+  /**
+   * Options for devices that have one or more switch.
+   */
+  [ 'switch:0' ]?: SwitchOptions;
+  /**
+   * Options for devices that have multiple switches.
+   */
+  [ 'switch:1' ]?: SwitchOptions;
+  /**
+   * Options for devices that have multiple switches.
+   */
+  [ 'switch:2' ]?: SwitchOptions;
+  /**
+   * Options for devices that have multiple switches.
+   */
+  [ 'switch:3' ]?: SwitchOptions;
   /**
    * Options for devices that have a cover.
    */

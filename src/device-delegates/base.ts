@@ -10,7 +10,7 @@ import {
 } from '../abilities';
 import { Accessory, AccessoryId } from '../accessory';
 import { DeviceLogger } from '../utils/device-logger';
-import { CoverOptions, DeviceOptions } from '../config';
+import { CoverOptions, DeviceOptions, SwitchOptions } from '../config';
 import { ShellyPlatform } from '../platform';
 
 /**
@@ -176,6 +176,10 @@ export abstract class DeviceDelegate {
    */
   protected addSwitch(swtch: Switch, opts?: Partial<AddSwitchOptions>): Accessory {
     const o = opts ?? {};
+
+    // get the config options for this switch
+    const switchOpts = this.getComponentOptions<SwitchOptions>(swtch) ?? {};
+
     const id = o.single === true ? 'switch' : `switch-${swtch.id}`;
     const nameSuffix = o.single === true ? null : `Switch ${swtch.id + 1}`;
 
@@ -185,7 +189,7 @@ export abstract class DeviceDelegate {
       new SwitchAbility(swtch),
       // use the apower property to determine whether power metering is available
       new PowerMeterAbility(swtch).setActive(swtch.apower !== undefined),
-    ).setActive(o.active !== false);
+    ).setActive(switchOpts.exclude !== true && o.active !== false);
   }
 
   /**

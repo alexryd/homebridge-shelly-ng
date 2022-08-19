@@ -85,6 +85,50 @@
               "type": "string",
               "description": "The password to use if the Shelly device requires authentication."
             },
+            "switch:0": {
+              "title": "Switch 1",
+              "type": "object",
+              "properties": {
+                "exclude": {
+                  "title": "Exclude this switch",
+                  "type": "boolean",
+                  "default": false
+                }
+              }
+            },
+            "switch:1": {
+              "title": "Switch 2",
+              "type": "object",
+              "properties": {
+                "exclude": {
+                  "title": "Exclude this switch",
+                  "type": "boolean",
+                  "default": false
+                }
+              }
+            },
+            "switch:2": {
+              "title": "Switch 3",
+              "type": "object",
+              "properties": {
+                "exclude": {
+                  "title": "Exclude this switch",
+                  "type": "boolean",
+                  "default": false
+                }
+              }
+            },
+            "switch:3": {
+              "title": "Switch 4",
+              "type": "object",
+              "properties": {
+                "exclude": {
+                  "title": "Exclude this switch",
+                  "type": "boolean",
+                  "default": false
+                }
+              }
+            },
             "cover:0": {
               "title": "Cover",
               "type": "object",
@@ -141,9 +185,45 @@
           }
         },
         {
+          "key": "devices[].switch:0",
+          "condition": {
+            "functionBody": "return model.devices && !model.devices[arrayIndices[0]].exclude && model.devices[arrayIndices[0]].id && model.devices[arrayIndices[0]].id.match(/^\\s*(?:shellyplus1|shellyplus1pm|shellyplus2pm|shellyplusplug|shellyplusplugus|shellypro1|shellypro1pm|shellypro2|shellypro2pm|shellypro3|shellypro4pm)-/i) !== null"
+          },
+          "items": [
+            "devices[].switch:0.exclude"
+          ]
+        },
+        {
+          "key": "devices[].switch:1",
+          "condition": {
+            "functionBody": "return model.devices && !model.devices[arrayIndices[0]].exclude && model.devices[arrayIndices[0]].id && model.devices[arrayIndices[0]].id.match(/^\\s*(?:shellyplus2pm|shellypro2|shellypro2pm|shellypro3|shellypro4pm)-/i) !== null"
+          },
+          "items": [
+            "devices[].switch:1.exclude"
+          ]
+        },
+        {
+          "key": "devices[].switch:2",
+          "condition": {
+            "functionBody": "return model.devices && !model.devices[arrayIndices[0]].exclude && model.devices[arrayIndices[0]].id && model.devices[arrayIndices[0]].id.match(/^\\s*(?:shellypro3|shellypro4pm)-/i) !== null"
+          },
+          "items": [
+            "devices[].switch:2.exclude"
+          ]
+        },
+        {
+          "key": "devices[].switch:3",
+          "condition": {
+            "functionBody": "return model.devices && !model.devices[arrayIndices[0]].exclude && model.devices[arrayIndices[0]].id && model.devices[arrayIndices[0]].id.match(/^\\s*(?:shellypro4pm)-/i) !== null"
+          },
+          "items": [
+            "devices[].switch:3.exclude"
+          ]
+        },
+        {
           "key": "devices[].cover:0",
           "condition": {
-            "functionBody": "return model.devices && !model.devices[arrayIndices[0]].exclude && (model.devices[arrayIndices[0]].id.substr(0, 13).toLowerCase() === 'shellyplus2pm' || model.devices[arrayIndices[0]].id.substr(0, 12).toLowerCase() === 'shellypro2pm')"
+            "functionBody": "return model.devices && !model.devices[arrayIndices[0]].exclude && model.devices[arrayIndices[0]].id && model.devices[arrayIndices[0]].id.match(/\\s*(?:shellyplus2pm|shellypro2pm)-/i) !== null"
           },
           "items": [
             "devices[].cover:0.exclude",
