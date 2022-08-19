@@ -9,7 +9,7 @@ export class ShellyPlusPlugUsDelegate extends DeviceDelegate {
   protected setup() {
     const d = this.device as ShellyPlusPlugUs;
 
-    this.createSwitch(d.switch0, true);
+    this.addSwitch(d.switch0, { single: true });
   }
 }
 

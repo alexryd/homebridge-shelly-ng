@@ -9,9 +9,9 @@ export class ShellyPro3Delegate extends DeviceDelegate {
   protected setup() {
     const d = this.device as ShellyPro3;
 
-    this.createSwitch(d.switch0);
-    this.createSwitch(d.switch1);
-    this.createSwitch(d.switch2);
+    this.addSwitch(d.switch0);
+    this.addSwitch(d.switch1);
+    this.addSwitch(d.switch2);
   }
 }
 

@@ -27,6 +27,24 @@ export interface DeviceClass {
   model: string;
 }
 
+export interface AddSwitchOptions {
+  /**
+   * Whether the accessory should be active.
+   */
+  active: boolean;
+  /**
+   * Whether the device has a single switch.
+   */
+  single: boolean;
+}
+
+export interface AddCoverOptions {
+  /**
+   * Whether the accessory should be active.
+   */
+  active: boolean;
+}
+
 /**
  * A DeviceDelegate manages accessories for a device.
  */
@@ -152,13 +170,14 @@ export abstract class DeviceDelegate {
   }
 
   /**
-   * Creates a switch accessory.
+   * Creates an accessory for a switch component.
    * @param swtch - The switch component to use.
-   * @param single - Whether the device has a single switch.
+   * @param opts - Options for the switch.
    */
-  protected createSwitch(swtch: Switch, single = false): Accessory {
-    const id = single ? 'switch' : `switch-${swtch.id}`;
-    const nameSuffix = single ? null : `Switch ${swtch.id + 1}`;
+  protected addSwitch(swtch: Switch, opts?: Partial<AddSwitchOptions>): Accessory {
+    const o = opts ?? {};
+    const id = o.single === true ? 'switch' : `switch-${swtch.id}`;
+    const nameSuffix = o.single === true ? null : `Switch ${swtch.id + 1}`;
 
     return this.createAccessory(
       id,
@@ -166,17 +185,22 @@ export abstract class DeviceDelegate {
       new SwitchAbility(swtch),
       // use the apower property to determine whether power metering is available
       new PowerMeterAbility(swtch).setActive(swtch.apower !== undefined),
-    );
+    ).setActive(o.active !== false);
   }
 
   /**
-   * Creates a cover accessory.
+   * Creates an accessory for a cover component.
    * @param cover - The cover component to use.
+   * @param opts - Options for the cover.
    */
-  protected createCover(cover: Cover): Accessory {
-    // get the config options for this cover and determine its type
-    const opts = this.getComponentOptions<CoverOptions>(cover);
-    const type = opts && typeof opts.type === 'string' ? opts.type.toLowerCase() : 'window';
+  protected addCover(cover: Cover, opts?: Partial<AddCoverOptions>): Accessory {
+    const o = opts ?? {};
+
+    // get the config options for this cover
+    const coverOpts = this.getComponentOptions<CoverOptions>(cover) ?? {};
+
+    // determine the cover tyoe
+    const type = typeof coverOpts.type === 'string' ? coverOpts.type.toLowerCase() : 'window';
     const isDoor = type === 'door';
     const isWindowCovering = type === 'windowcovering';
 
@@ -187,7 +211,7 @@ export abstract class DeviceDelegate {
       new CoverAbility(cover, 'windowCovering').setActive(isWindowCovering),
       new CoverAbility(cover, 'window').setActive(!isDoor && !isWindowCovering),
       new PowerMeterAbility(cover),
-    );
+    ).setActive(o.active !== false);
   }
 
   /**
