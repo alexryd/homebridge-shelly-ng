@@ -211,7 +211,7 @@ export abstract class DeviceDelegate {
       new CoverAbility(cover, 'windowCovering').setActive(isWindowCovering),
       new CoverAbility(cover, 'window').setActive(!isDoor && !isWindowCovering),
       new PowerMeterAbility(cover),
-    ).setActive(o.active !== false);
+    ).setActive(coverOpts.exclude !== true && o.active !== false);
   }
 
   /**

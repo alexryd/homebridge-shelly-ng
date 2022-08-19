@@ -53,6 +53,10 @@ const DEFAULT_WEB_SOCKET_OPTIONS: Readonly<WebSocketOptions> = {
 
 export interface CoverOptions {
   /**
+   * Whether this cover should be excluded.
+   */
+  exclude?: boolean;
+  /**
    * The type of accessory used to represent the cover.
    */
   type?: 'door' | 'window' | 'windowCovering';

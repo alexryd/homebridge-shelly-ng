@@ -89,6 +89,11 @@
               "title": "Cover",
               "type": "object",
               "properties": {
+                "exclude": {
+                  "title": "Exclude this cover",
+                  "type": "boolean",
+                  "default": false
+                },
                 "type": {
                   "title": "Type",
                   "description": "The type of accessory used to represent the cover. This setting apply only when the device is in cover mode.",
@@ -141,6 +146,7 @@
             "functionBody": "return model.devices && !model.devices[arrayIndices[0]].exclude && (model.devices[arrayIndices[0]].id.substr(0, 13).toLowerCase() === 'shellyplus2pm' || model.devices[arrayIndices[0]].id.substr(0, 12).toLowerCase() === 'shellypro2pm')"
           },
           "items": [
+            "devices[].cover:0.exclude",
             "devices[].cover:0.type"
           ]
         }
