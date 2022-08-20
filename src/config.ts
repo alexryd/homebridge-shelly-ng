@@ -56,6 +56,10 @@ export interface SwitchOptions {
    * Whether this switch should be excluded.
    */
   exclude?: boolean;
+  /**
+   * The type of accessory used to represent the switch.
+   */
+  type?: 'outlet' | 'switch';
 }
 
 export interface CoverOptions {

@@ -5,6 +5,7 @@ import {
   Ability,
   AccessoryInformationAbility,
   CoverAbility,
+  OutletAbility,
   PowerMeterAbility,
   SwitchAbility,
 } from '../abilities';
@@ -180,13 +181,18 @@ export abstract class DeviceDelegate {
     // get the config options for this switch
     const switchOpts = this.getComponentOptions<SwitchOptions>(swtch) ?? {};
 
+    // determine the switch tyoe
+    const type = typeof switchOpts.type === 'string' ? switchOpts.type.toLowerCase() : 'switch';
+    const isOutlet = type === 'outlet';
+
     const id = o.single === true ? 'switch' : `switch-${swtch.id}`;
     const nameSuffix = o.single === true ? null : `Switch ${swtch.id + 1}`;
 
     return this.createAccessory(
       id,
       nameSuffix,
-      new SwitchAbility(swtch),
+      new OutletAbility(swtch).setActive(isOutlet),
+      new SwitchAbility(swtch).setActive(!isOutlet),
       // use the apower property to determine whether power metering is available
       new PowerMeterAbility(swtch).setActive(swtch.apower !== undefined),
     ).setActive(switchOpts.exclude !== true && o.active !== false);
