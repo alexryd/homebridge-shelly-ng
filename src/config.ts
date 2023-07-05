@@ -164,7 +164,7 @@ export class PlatformOptions {
       // loop through each item and add default values
       for (const d of config.devices) {
         if (d && typeof d.id === 'string') {
-          this.deviceOptions.set(d.id.toLowerCase(), { ...DEFAULT_DEVICE_OPTIONS, ...d });
+          this.deviceOptions.set(d.id, { ...DEFAULT_DEVICE_OPTIONS, ...d });
         }
       }
     }
