@@ -12,6 +12,7 @@ const names = {
 export class CoverAbility extends Ability {
   /**
    * @param component - The cover component to control.
+   * @param type - The type of cover.
    */
   constructor(readonly component: Cover, readonly type: 'door' | 'window' | 'windowCovering' = 'window') {
     super(
@@ -32,12 +33,10 @@ export class CoverAbility extends Ability {
   /**
    * The current state of the cover.
    */
-  protected get positionState(): number {
-    const state = this.component.state;
-
-    if (state === 'opening') {
+  protected get positionState(): CharacteristicValue {
+    if (this.component.state === 'opening') {
       return this.Characteristic.PositionState.INCREASING;
-    } else if (state === 'closing') {
+    } else if (this.component.state === 'closing') {
       return this.Characteristic.PositionState.DECREASING;
     }
 
@@ -47,20 +46,20 @@ export class CoverAbility extends Ability {
   /**
    * The current position of the cover.
    */
-  protected get currentPosition(): number {
+  protected get currentPosition(): CharacteristicValue {
     return this.component.current_pos ?? 0;
   }
 
   /**
    * The target position that the cover is moving towards.
    */
-  protected get targetPosition(): number {
+  protected get targetPosition(): CharacteristicValue {
     return this.component.target_pos ?? this.currentPosition;
   }
 
   protected initialize() {
     // abort if this cover hasn't been calibrated
-    if (this.component.pos_control !== true) {
+    if (!this.component.pos_control) {
       this.log.warn('Only calibrated covers are supported.');
       return;
     }
@@ -112,23 +111,46 @@ export class CoverAbility extends Ability {
    * Handles changes to the `state` property.
    */
   protected stateChangeHandler() {
+    this.log.debug(`${this.component.id} state changed to ${this.positionState}`, {
+      target: this.targetPosition,
+      current: this.currentPosition,
+    })
+    this.updateStates();
+  }
+
+  // We need to update all states when any of them change, otherwise HomeKit
+  // gets confused and thinks the cover is in a different state than it actually
+  // is. Shelly does not send all attributes in any single update, so we need
+  // to update all of them when any of them change.
+  protected updateStates() {
     this.service.getCharacteristic(this.Characteristic.PositionState)
-      .updateValue(this.positionState);
+    .updateValue(this.positionState);
+    this.service.getCharacteristic(this.Characteristic.TargetPosition)
+        .updateValue(this.targetPosition);
+    this.service.getCharacteristic(this.Characteristic.CurrentPosition)
+        .updateValue(this.currentPosition);
   }
 
   /**
    * Handles changes to the `current_pos` property.
    */
   protected currentPosChangeHandler() {
-    this.service.getCharacteristic(this.Characteristic.CurrentPosition)
-      .updateValue(this.currentPosition);
+    this.log.debug(`${this.component.id} position changed to ${this.currentPosition}`, {
+      target: this.targetPosition,
+      state: this.positionState,
+    })
+    this.updateStates();
   }
 
   /**
    * Handles changes to the `target_pos` property.
    */
   protected targetPosChangeHandler() {
-    this.service.getCharacteristic(this.Characteristic.TargetPosition)
-      .updateValue(this.targetPosition);
+    this.log.debug(`${this.component.id} target position changed to ${this.targetPosition}`, {
+      state: this.positionState,
+      current: this.currentPosition,
+    })
+    this.updateStates();
   }
+
 }
